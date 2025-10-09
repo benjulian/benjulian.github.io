@@ -3,41 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bajo el capó de la Regresión Lineal</title>
     
-    <!-- El título de la pestaña del navegador será el del post -->
-    <title>Linear Regression Under the Hood</title>
-    
-    <!-- MUY IMPORTANTE: La ruta al CSS ahora es ../style.css -->
-    <!-- Los dos puntos (..) significan "subir un nivel de carpeta" -->
     <link rel="stylesheet" href="../style.css"> 
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Mantenemos la combinación original que te gustó -->
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Cargar MathJax para renderizar ecuaciones LaTeX -->
+    
+    <!-- Hoja de estilos de Prism.js (tema oscuro "Tomorrow Night") -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
 </head>
 <body>
 
-    <!-- Contenedor principal para el contenido del post -->
     <main class="post-full">
         <header class="post-header">
-            <h1>Linear Regression Under the Hood</h1>
-            <p class="post-meta">9 of october, 2025</p>
+            <h1>Bajo el capó de la Regresión Lineal</h1>
+            <p class="post-meta">Publicado el 9 de Octubre, 2025 por Benjamin Julian</p>
         </header>
 
         <article class="post-content">
-            <!-- ======================================================= -->
-            <!--  AQUÍ IRÁ EL CONTENIDO CONVERTIDO DE TU ARCHIVO LATEX  -->
-            <!-- ======================================================= -->
-
-            <p>Este es el comienzo de tu artículo. Cuando me pases el contenido en formato LaTeX, lo convertiré a HTML y reemplazaremos todo este texto de marcador de posición.</p>
-            <p>El contenido incluirá párrafos de texto, listas, y por supuesto, las fórmulas matemáticas bellamente renderizadas, como esta:</p>
+            <p>Aquí comenzaría la explicación teórica del modelo, con sus fundamentos matemáticos. Veremos cómo se define la línea de regresión:</p>
             
-            <p>$$ y = \beta_0 + \beta_1 x + \epsilon $$</p>
+            $$ y = \beta_0 + \beta_1 x + \epsilon $$
 
-            <p>Hablaremos sobre cómo estimar los coeficientes, qué significa el término de error y cómo interpretar los resultados del modelo. ¡Prepárate para sumergirte en las matemáticas detrás del Machine Learning!</p>
+            <p>Luego, podemos mostrar cómo se traduce este concepto a código Python. Por ejemplo, para implementar una función que predice valores usando los coeficientes $\beta_0$ y $\beta_1$, podemos usar un fragmento de código como este. Nota como mencionamos variables como `beta_0` directamente en el texto.</p>
+
+            <!-- EJEMPLO DE BLOQUE DE CÓDIGO -->
+            <pre><code class="language-python">
+# Importamos la librería necesaria
+import numpy as np
+
+def predict(beta_0, beta_1, X):
+    """
+    Calcula las predicciones 'y' para un conjunto de datos X.
+    """
+    # y_hat = beta_0 + beta_1 * X
+    return beta_0 + beta_1 * X
+
+# Ejemplo de uso
+b0 = 2.5  # Intercepto
+b1 = 1.8  # Pendiente
+X_test = np.array([1, 2, 3, 4, 5])
+
+predictions = predict(b0, b1, X_test)
+print(f"Predicciones: {predictions}")
+            </code></pre>
+            
+            <p>Como puedes ver, el código es mucho más fácil de leer con los colores y el formato adecuado. Este es solo un fragmento. Si quieres ver el script completo donde se calcula el error, se ajustan los coeficientes y se visualizan los datos, puedes encontrarlo en el repositorio.</p>
+
+            <!-- ENLACE AL SCRIPT COMPLETO EN GITHUB -->
+            <a href="https://github.com/TU_USUARIO/TU_REPOSITORIO/blob/main/scripts/regresion_lineal.py" class="code-link-button" target="_blank">Ver script completo en GitHub</a>
 
         </article>
         
@@ -49,6 +67,10 @@
     <footer class="main-footer">
         <p>&copy; 2025 - Benjamin Julian</p>
     </footer>
+
+    <!-- Script de Prism.js (debe ir al final del body) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 
 </body>
 </html>
