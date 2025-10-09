@@ -33,6 +33,17 @@ body {
     margin: 0;
 }
 
+/* Estilo de la descripción del blog debajo del título */
+.blog-description {
+    font-size: 1.1em;
+    color: #a0a0a0; /* Mismo color que la descripción de los posts para consistencia */
+    font-style: italic; /* Le da un toque de estilo para diferenciarlo */
+    font-family: 'Lora', serif;
+    margin-top: 10px;
+    margin-bottom: 0;
+    font-weight: 400;
+}
+
 /* Estilo de la barra de navegación */
 .main-nav {
     text-align: center;
