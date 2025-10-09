@@ -1,0 +1,97 @@
+/* Configuración general del cuerpo de la página */
+body {
+    background-color: #121212; /* Un negro no tan puro, más agradable a la vista */
+    color: #e0e0e0; /* Un gris claro para el texto general */
+    font-family: 'Lora', serif; /* Una fuente elegante para la lectura */
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Contenedor principal para centrar el contenido */
+.main-header, .main-nav, .content, .main-footer {
+    width: 100%;
+    max-width: 800px; /* Ancho máximo para el contenido, mejora la legibilidad */
+    padding: 0 20px;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+}
+
+/* Estilo del encabezado y título principal */
+.main-header {
+    text-align: center;
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+.main-header h1 {
+    font-size: 2.8em;
+    font-weight: 400;
+    color: #ffffff; /* Título en blanco puro para destacar */
+    margin: 0;
+}
+
+/* Estilo de la barra de navegación */
+.main-nav {
+    text-align: center;
+    padding-bottom: 40px;
+    border-bottom: 1px solid #333; /* Línea sutil para separar la cabecera */
+}
+
+.main-nav a {
+    color: #a0a0a0; /* Color de los enlaces de navegación */
+    text-decoration: none;
+    margin: 0 15px;
+    font-family: 'Source Code Pro', monospace; /* Fuente monoespaciada para un look técnico */
+    font-size: 0.9em;
+    transition: color 0.3s ease;
+}
+
+.main-nav a:hover {
+    color: #ffffff; /* El enlace se vuelve blanco al pasar el cursor */
+}
+
+/* Contenido principal y lista de posts */
+.content {
+    padding-top: 40px;
+}
+
+.post-preview {
+    margin-bottom: 50px;
+}
+
+.post-preview h2 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+/* Estilo de los títulos de los posts, que son enlaces */
+.post-preview h2 a {
+    color: #f5f5f5; /* Un blanco ligeramente apagado para los títulos */
+    text-decoration: none;
+    font-size: 1.6em;
+    transition: color 0.3s ease;
+}
+
+.post-preview h2 a:hover {
+    color: #9e9e9e; /* El color cambia al pasar el cursor para indicar que es un enlace */
+}
+
+/* Estilo de la descripción del post */
+.post-preview p {
+    color: #a0a0a0; /* Un gris más suave para la descripción */
+    margin-top: 0;
+    font-size: 1.1em;
+}
+
+/* Estilo del pie de página */
+.main-footer {
+    text-align: center;
+    padding: 40px 0;
+    margin-top: 40px;
+    border-top: 1px solid #333; /* Línea sutil para separar el pie de página */
+    font-size: 0.8em;
+    color: #666;
+}
