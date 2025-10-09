@@ -106,3 +106,63 @@ body {
     font-size: 0.8em;
     color: #666;
 }
+
+/* --- Estilos para la página de un post individual --- */
+
+/* Contenedor principal del post */
+.post-full {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cabecera del post con el título y la metainformación */
+.post-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #333;
+}
+
+.post-header h1 {
+    font-size: 2.8em;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.post-meta {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.8em;
+    color: #888;
+    margin: 0;
+}
+
+/* Contenido del artículo */
+.post-content {
+    font-size: 1.1em;
+    line-height: 1.7;
+}
+
+.post-content p {
+    margin-bottom: 1.5em;
+}
+
+/* Enlace para volver al inicio */
+.post-nav {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.back-link {
+    font-family: 'Source Code Pro', monospace;
+    color: #a0a0a0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #ffffff;
+}
