@@ -25,40 +25,46 @@
         </header>
 
         <article class="post-content">
-            <p>Aquí comenzaría la explicación teórica del modelo, con sus fundamentos matemáticos. Veremos cómo se define la línea de regresión:</p>
-            
+            <h2>Introduction</h2>
+            <p>One of the most fundamental machine learning models is Linear Regression.</p>
+            <p>Even though it is a super simple model, it allows us to create a mathematical model that can predict outcomes based on its inputs. Although it has a lot of relation with statistics and probability, in this post we will focus on the pure math mechanics of Linear Regression.</p>
+            <p>In order to achieve a complete understanding of the content of this post, the reader must be familiar with the following branches of mathematics:</p>
+            <ul>
+                <li>Linear Algebra (as this is the language of machine learning models);</li>
+                <li>Calculus (as it is the language of change);</li>
+                <li>Optimization (as it is how the model "learns")</li>
+            </ul>
+
+            <h2>Model Architecture</h2>
+            <p>Let us start by picturing how to architecture of the model is. From this, we can take a look at the following image:</p>
+            <p><em>[HERE WILL BE AN IMAGE]</em></p>
+            <p>As the image shows, the architecture is rather simple.</p>
+            <p>First, we multiply each of the "feature" values (mathematically, those are variables, but in the context of machine leaning, we call them features) with its corresponding "weight" value (again, technically those are variables, but in this context, we call them weights), sum those products up and then add a last value, called "bias".</p>
+            <p>That final value is the corresponding prediction of our model based on the inputs.</p>
+
+            <h2>Data</h2>
+            <p><strong><em>IMPORTANT NOTE: in these posts, ALL of the vectors will be treated as matrices.</em></strong></p>
+            <p>First, even though we will analyze the model as we only have one sample with one single feature (something that is almost never the case in machine learning), the fact that we will treat each vector as matrices will, intuitively, let you understand how it works if there are more samples and / or features.</p>
+
+            <h3>Feature data</h3>
+            <p>The main data we collect is the so called "feature data", that is represented with an X.</p>
+            <p>X will be represented as a matrix, with the first index "a" meaning "number of samples" and the second index "b" meaning "number of features".</p>
+            <p>It is like this:</p>
             \[
-            y = \beta_0 + \beta_1 x + \epsilon
+            X = \begin{bmatrix}
+                3 
+            \end{bmatrix} \rightarrow X \in \mathbb{R}^{1(a) \times 1(b)} 
             \]
 
-            <p>Luego, podemos mostrar cómo se traduce este concepto a código Python. Por ejemplo, para implementar una función que predice valores usando los coeficientes \( \beta_0 \) y \( \beta_1 \), podemos usar un fragmento de código como este. Nota como mencionamos variables como `beta_0` directamente en el texto.</p>
-
-            <!-- EJEMPLO DE BLOQUE DE CÓDIGO -->
-            <pre><code class="language-python">
-# Importamos la librería necesaria
-import numpy as np
-
-def predict(beta_0, beta_1, X):
-    """
-    Calcula las predicciones 'y' para un conjunto de datos X.
-    """
-    # y_hat = beta_0 + beta_1 * X
-    return beta_0 + beta_1 * X
-
-# Ejemplo de uso
-b0 = 2.5  # Intercepto
-b1 = 1.8  # Pendiente
-X_test = np.array([1, 2, 3, 4, 5])
-
-predictions = predict(b0, b1, X_test)
-print(f"Predicciones: {predictions}")
-            </code></pre>
-            
-            <p>Como puedes ver, el código es mucho más fácil de leer con los colores y el formato adecuado. Este es solo un fragmento. Si quieres ver el script completo donde se calcula el error, se ajustan los coeficientes y se visualizan los datos, puedes encontrarlo en el repositorio.</p>
-
-            <!-- ENLACE AL SCRIPT COMPLETO EN GITHUB -->
-            <a href="https://github.com/TU_USUARIO/TU_REPOSITORIO/blob/main/scripts/regresion_lineal.py" class="code-link-button" target="_blank">Ver script completo en GitHub</a>
-
+            <h3>Objective value data</h3>
+            <p>The corresponding data associated with the feature data contains the value at which the model should aim. This data is represented with a Y.</p>
+            <p>Y will be represented as a matrix also, with the first index "a" meaning "number of samples" and the second index "c" meaning the "number of objective values".</p>
+            <p>It is like this:</p>
+            \[
+            Y = \begin{bmatrix}
+                3 
+            \end{bmatrix} \rightarrow Y \in \mathbb{R}^{1(a) \times 1(c)}
+            \]
         </article>
         
         <nav class="post-nav">
