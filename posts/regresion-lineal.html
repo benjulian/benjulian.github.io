@@ -21,45 +21,98 @@
     <main class="post-full">
         <header class="post-header">
             <h1>Linear Regression Under the Hood</h1>
-            <p class="post-meta">9 of October, 2025</p>
+            <p class="post-meta">11 of October, 2025</p>
         </header>
 
         <article class="post-content">
+            
             <h2>El Génesis de una Idea: Trazando el Camino hacia la Predicción Matemática</h2>
             <p>En nuestra perpetua búsqueda por descifrar los patrones del universo, nos enfrentamos a un desafío fundamental: ¿cómo podemos aproximar un valor desconocido a partir de un conjunto de observaciones existentes? Imaginemos que disponemos de ciertos datos y observamos una posible conexión entre ellos. Si, al visualizar estos datos en un gráfico, percibimos que los puntos tienden a seguir una trayectoria rectilínea, nace una hipótesis intrigante: quizás podríamos modelar esta relación utilizando la formulación matemática de una recta.</p>
             <p>Este es el punto de partida de nuestra investigación. No asumimos conocimiento previo sobre "modelos de aprendizaje automático", sino que nos embarcamos en un proceso de descubrimiento, armados únicamente con herramientas matemáticas. Nuestra meta es construir, desde sus cimientos, un formalismo que nos permita no solo describir una relación aparente, sino también predecir valores futuros.</p>
 
-            <h2>Formalización de los Datos: Definiendo Nuestros Objetos Matemáticos</h2>
+            <h3>Formalización de los Datos: Definiendo Nuestros Objetos Matemáticos</h3>
             <p>Para abordar este problema con el rigor que merece, primero debemos definir la estructura de nuestros datos en un lenguaje puramente matemático. Desde esta perspectiva, trataremos todos nuestros conjuntos de datos como objetos matemáticos, específicamente como matrices y vectores. Esta aproximación nos proporciona una generalización poderosa, permitiéndonos extender nuestro razonamiento a múltiples muestras y variables con elegancia.</p>
+            <ul>
+                <li><strong>Matriz de Variables Independientes (X):</strong> Consideremos un conjunto de <em>a</em> muestras o ejemplos. Para cada una de estas muestras, observamos <em>b</em> características distintas. En el campo de la inteligencia artificial, estas características a menudo se denominan <em>"features"</em>. Sin embargo, desde una perspectiva estrictamente matemática, debemos entenderlas como variables que definen la dimensionalidad de nuestro objeto. Por lo tanto, nuestros datos de entrada se representan como una matriz \(X\) de dimensiones \(a \times b\).</li>
+                <li><strong>Matriz de Variables Dependientes (Y):</strong> Para cada una de nuestras <em>a</em> muestras, existe un valor <em>c</em> correspondiente que deseamos aproximar o predecir. Estos valores constituyen nuestra matriz de salida \(Y\), con dimensiones \(a \times c\).</li>
+            </ul>
+            <p>Nuestro desafío, por lo tanto, es encontrar una transformación matemática que nos permita mapear la matriz de entrada \(X\) a la matriz de salida \(Y\) de la manera más precisa posible.</p>
 
-            <h3>Matriz de Variables Independientes (X)</h3>
-            <p>Consideremos un conjunto de <em>a</em> muestras o ejemplos. Para cada una de estas muestras, observamos <em>b</em> características distintas. En el campo de la inteligencia artificial, estas características a menudo se denominan "features". Sin embargo, desde una perspectiva estrictamente matemática, debemos entenderlas como variables que definen la dimensionalidad de nuestro objeto. Por lo tanto, nuestros datos de entrada se representan como una matriz X de dimensiones <em>a × b</em>.</p>
+            <h3>La Hipótesis Lineal: Modelando la Relación con la Ecuación de una Recta</h3>
+            <p>Si la relación visual entre nuestras variables sugiere una línea recta, la lógica nos dicta explorar la ecuación fundamental que describe dicha forma. Extendiendo esta idea a nuestras estructuras matriciales, postulamos la existencia de una matriz de <strong>pesos (W)</strong> y una matriz de <strong>sesgos (B)</strong>, también conocida como <em>bias</em>, que definen la transformación lineal.</p>
+            <ul>
+                <li><strong>Matriz de Pesos (W):</strong> Esta matriz, de dimensiones \(b \times c\), contendrá los coeficientes que ponderan la influencia de cada una de las <em>b</em> variables de entrada sobre cada una de las <em>c</em> variables de salida.</li>
+                <li><strong>Matriz de Sesgo (B):</strong> Esta matriz, de dimensiones \(a \times c\), representa el término de la ordenada al origen, un desplazamiento constante para cada muestra y clase.</li>
+            </ul>
+            <p>Así, nuestra hipótesis inicial se formaliza en la siguiente ecuación matricial. Esta operación, que denominaremos nuestro <strong>"Pase hacia Adelante" (Forward Pass)</strong>, constituye el núcleo de nuestro modelo predictivo:</p>
+            \[ Z = XW + B \]
+            <p>Donde \(Z\) es la matriz resultante de nuestras predicciones. Nuestro objetivo ahora es claro: debemos encontrar los valores óptimos para las matrices \(W\) y \(B\) de tal forma que la diferencia entre nuestras predicciones (\(Z\)) y los valores reales (\(Y\)) sea mínima.</p>
+            
+            <hr>
 
-            <h3>Matriz de Variables Dependientes (Y)</h3>
-            <p>Para cada una de nuestras <em>a</em> muestras, existe un valor <em>c</em> correspondiente que deseamos aproximar o predecir. Estos valores constituyen nuestra matriz de salida Y, con dimensiones <em>a × c</em>.</p>
-            <p>Nuestro desafío, por lo tanto, es encontrar una transformación matemática que nos permita mapear la matriz de entrada X a la matriz de salida Y de la manera más precisa posible.</p>
+            <h2>El Pase hacia Adelante: Articulando la Predicción a través de la Notación Tensorial</h2>
+            <p>Aquí, adoptaremos un lenguaje matemático de inmensa potencia y elegancia para describir las interacciones entre nuestros objetos multidimensionales: la <strong>Notación de Sumación de Einstein</strong>. Su regla fundamental es simple pero profunda: <strong>si un índice se repite en un único término de una ecuación, se implica una suma sobre todos los valores posibles de ese índice.</strong> Esta herramienta será la piedra angular de nuestro desarrollo.</p>
+            <p>Armados con esta notación, reescribimos la ecuación de nuestro Pase hacia Adelante para un elemento \(Z_{ac}\) arbitrario de la matriz de predicciones \(Z\):</p>
+            \[ Z_{ac} = X_{ab} W_{bc} + B_{ac} \]
+            <p>Desentrañemos el significado de esta expresión. El término \(Z_{ac}\) representa el valor predicho para la <em>a</em>-ésima muestra y la <em>c</em>-ésima clase de salida.</p>
+            <ol>
+                <li><strong>Contracción Tensorial (\(X_{ab} W_{bc}\)):</strong> El índice \(b\) se repite, por lo que la Notación de Einstein nos indica que debemos realizar una suma sobre todas sus posibles instancias. Explícitamente, esto es: \( \sum_{b} X_{ab} W_{bc} \). Matematicamente, tomamos la <em>a</em>-ésima fila de la matriz \(X\) y la multiplicamos elemento a elemento por la <em>c</em>-ésima columna de la matriz \(W\), sumando los resultados.</li>
+                <li><strong>Adición del Sesgo (\(+ B_{ac}\)):</strong> Una vez calculada la suma ponderada, simplemente añadimos el término de sesgo \(B_{ac}\), que actúa como un desplazamiento.</li>
+            </ol>
+            <p>Hemos formalizado nuestro mecanismo de predicción. Sin embargo, en esta etapa, los valores de \(W\) y \(B\) son arbitrarios. El siguiente paso ineludible es cuantificar la discrepancia entre nuestras predicciones \(Z\) y los valores reales \(Y\).</p>
+            
+            <hr>
 
-            <h2>La Hipótesis Lineal: Modelando la Relación con la Ecuación de una Recta</h2>
-            <p>Si la relación visual entre nuestras variables sugiere una línea recta, la lógica nos dicta explorar la ecuación fundamental que describe dicha forma. En su versión más simple, para una sola muestra y una sola característica, esta relación se expresa como:</p>
-            \[
-            y = wx + b
-            \]
-            <p>donde <em>w</em> representa la pendiente y <em>b</em> la ordenada al origen.</p>
-            <p>Extendiendo esta idea a nuestras estructuras matriciales, postulamos la existencia de una matriz de pesos (<em>W</em>) y una matriz de sesgos (<em>B</em>), también conocida como <em>bias</em>, que definen la transformación lineal.</p>
+            <h2>La Función de Pérdida: Cuantificando el Error de Nuestra Hipótesis</h2>
+            <p>Requerimos una función que nos entregue un valor escalar que represente la discrepancia total. La aproximación más intuitiva es medir la distancia cuadrática entre cada predicción y su valor real para evitar que los errores positivos y negativos se anulen. Para que la métrica sea independiente del número de muestras, promediamos esta suma. Así llegamos a la <strong>Media del Error Cuadrático (MSE)</strong>:</p>
+            \[ \text{Loss} := \text{MSE} = \frac{1}{n} \sum_{a=1}^{A} \sum_{c=1}^{C} (Z_{ac} - Y_{ac})^2 \]
+            <p>Aquí, \(n\) representa el número total de muestras. Con esta ecuación, hemos transformado nuestro objetivo en un problema de optimización matemática: ¿cómo encontramos las matrices \(W\) y \(B\) que minimizan el valor de esta función?</p>
 
-            <h3>Matriz de Pesos (W)</h3>
-            <p>Esta matriz, de dimensiones <em>b × c</em>, contendrá los coeficientes que ponderan la influencia de cada una de las <em>b</em> variables de entrada sobre cada una de las <em>c</em> variables de salida.</p>
+            <hr>
+            
+            <h2>El Pase hacia Atrás: Navegando el Descenso del Error con Cálculo Tensorial</h2>
+            <p>Para minimizar el MSE, necesitamos calcular las derivadas parciales de la pérdida con respecto a cada parámetro: \( \frac{\partial \text{MSE}}{\partial W} \) y \( \frac{\partial \text{MSE}}{\partial B} \). Para ello, aplicamos la <strong>Regla de la Cadena</strong>. Usando la Notación de Einstein, para un peso específico \(W_{b'c'}\) es:</p>
+            \[ \frac{\partial \text{MSE}}{\partial W_{b'c'}} = \frac{\partial \text{MSE}}{\partial Z_{ac}} \frac{\partial Z_{ac}}{\partial W_{b'c'}} \]
+            
+            <h3>1. Derivada de la Pérdida respecto a las Predicciones (\( \frac{\partial \text{MSE}}{\partial Z_{ac}} \))</h3>
+            <p>Calculamos la derivada de la pérdida respecto a un único elemento \(Z_{a'c'}\). Dentro de la doble sumatoria de la función de pérdida, la derivada \( \frac{\partial Z_{ac}}{\partial Z_{a'c'}} \) introduce el <strong>Delta de Kronecker (\(\delta\))</strong>. Este filtro hace que la sumatoria colapse al único término donde \(a=a'\) y \(c=c'\), resultando en:</p>
+            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{2}{n} (Z_{a'c'} - Y_{a'c'}) \]
+            <p>Generalizando para toda la matriz, obtenemos nuestro primer tensor de derivada:</p>
+            \[ \frac{\partial \text{MSE}}{\partial Z} = \frac{2}{n} (Z - Y) \]
+            
+            <h3>2. Derivada de las Predicciones respecto a los Pesos (\( \frac{\partial Z_{ac}}{\partial W_{b'c'}} \))</h3>
+            <p>Partimos de \(Z_{ac} = \sum_{b} (X_{ab} W_{bc}) + B_{ac}\). Al derivar respecto a \(W_{b'c'}\), el Delta de Kronecker vuelve a filtrar la suma, dejando:</p>
+            \[ \frac{\partial Z_{ac}}{\partial W_{b'c'}} = X_{ab'} \delta_{cc'} \]
+            
+            <h3>Ensamblando el Gradiente Final para W</h3>
+            <p>Combinamos las dos piezas mediante la Regla de la Cadena. La suma implícita de Einstein y el filtro del Delta de Kronecker simplifican la expresión al producto matricial de la transpuesta de \(X\) y el tensor de error:</p>
+            \[ \frac{\partial \text{MSE}}{\partial W} = \frac{2}{n} X^T (Z - Y) \]
+            <p>De forma análoga, se demuestra que la derivada respecto al sesgo es:</p>
+            \[ \frac{\partial \text{MSE}}{\partial B} = \frac{2}{n} \sum_{a} (Z - Y) \]
+            
+            <hr>
 
-            <h3>Matriz de Sesgo (B)</h3>
-            <p>Esta matriz, de dimensiones <em>a × c</em>, representa el término de la ordenada al origen, un desplazamiento constante para cada muestra y clase.</p>
-
-            <p>Así, nuestra hipótesis inicial se formaliza en la siguiente ecuación matricial. Esta operación, que denominaremos nuestro "Pase hacia Adelante" (<em>Forward Pass</em>), constituye el núcleo de nuestro modelo predictivo:</p>
-
-            \[
-            Z = XW + B
-            \]
-
-            <p>Donde <em>Z</em> es la matriz resultante de nuestras predicciones. Nuestro objetivo ahora es claro: debemos encontrar los valores óptimos para las matrices <em>W</em> y <em>B</em> de tal forma que la diferencia entre nuestras predicciones (<em>Z</em>) y los valores reales (<em>Y</em>) sea mínima. Este será el siguiente paso en nuestro viaje para "descubrir" la regresión lineal.</p>
+            <h2>La Optimización: El Descenso Iterativo hacia la Verdad Matemática</h2>
+            <p>Poseemos los gradientes, que nos indican la dirección de máximo ascenso del error. Para minimizarlo, caminamos en la dirección opuesta. Este es el principio del <strong>Descenso del Gradiente</strong>. Para controlar el tamaño de cada paso en nuestro descenso, introducimos un hiperparámetro llamado <strong>Tasa de Aprendizaje (\(\alpha\))</strong>.</p>
+            <p>Esto nos da nuestras reglas de actualización de parámetros:</p>
+            \[ W_{\text{nuevo}} = W_{\text{anterior}} - \alpha \frac{\partial \text{MSE}}{\partial W} \]
+            \[ B_{\text{nuevo}} = B_{\text{anterior}} - \alpha \frac{\partial \text{MSE}}{\partial B} \]
+            
+            <h3>El Ciclo de Entrenamiento: El Mecanismo del Descubrimiento</h3>
+            <p>Finalmente, ensamblamos todas las piezas en un proceso iterativo:</p>
+            <ol>
+                <li><strong>Inicialización:</strong> Damos valores iniciales (generalmente aleatorios) a \(W\) y \(B\).</li>
+                <li><strong>Bucle Iterativo:</strong>
+                    <ol type="a">
+                        <li><strong>Pase hacia Adelante:</strong> Calculamos las predicciones \(Z = XW + B\).</li>
+                        <li><strong>Cálculo de la Pérdida:</strong> Medimos el error con el MSE para monitorear el progreso.</li>
+                        <li><strong>Pase hacia Atrás:</strong> Calculamos los gradientes \( \frac{\partial \text{MSE}}{\partial W} \) y \( \frac{\partial \text{MSE}}{\partial B} \).</li>
+                        <li><strong>Actualización de Parámetros:</strong> Aplicamos las reglas de actualización para obtener los nuevos \(W\) y \(B\).</li>
+                    </ol>
+                </li>
+                <li><strong>Repetición:</strong> Repetimos el bucle hasta que el modelo converja.</li>
+            </ol>
+            <p>Al concluir este proceso, hemos completado nuestro viaje: desde una intuición visual, hemos derivado un procedimiento matemático robusto que encuentra la transformación lineal óptima que mejor modela nuestros datos.</p>
         </article>
         
         <nav class="post-nav">
