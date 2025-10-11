@@ -25,46 +25,41 @@
         </header>
 
         <article class="post-content">
-            <h2>Introduction</h2>
-            <p>One of the most fundamental machine learning models is Linear Regression.</p>
-            <p>Even though it is a super simple model, it allows us to create a mathematical model that can predict outcomes based on its inputs. Although it has a lot of relation with statistics and probability, in this post we will focus on the pure math mechanics of Linear Regression.</p>
-            <p>In order to achieve a complete understanding of the content of this post, the reader must be familiar with the following branches of mathematics:</p>
-            <ul>
-                <li>Linear Algebra (as this is the language of machine learning models);</li>
-                <li>Calculus (as it is the language of change);</li>
-                <li>Optimization (as it is how the model "learns")</li>
-            </ul>
+            <h2>El Génesis de una Idea: Trazando el Camino hacia la Predicción Matemática</h2>
+            <p>En nuestra perpetua búsqueda por descifrar los patrones del universo, nos enfrentamos a un desafío fundamental: ¿cómo podemos aproximar un valor desconocido a partir de un conjunto de observaciones existentes? Imaginemos que disponemos de ciertos datos y observamos una posible conexión entre ellos. Si, al visualizar estos datos en un gráfico, percibimos que los puntos tienden a seguir una trayectoria rectilínea, nace una hipótesis intrigante: quizás podríamos modelar esta relación utilizando la formulación matemática de una recta.</p>
+            <p>Este es el punto de partida de nuestra investigación. No asumimos conocimiento previo sobre "modelos de aprendizaje automático", sino que nos embarcamos en un proceso de descubrimiento, armados únicamente con herramientas matemáticas. Nuestra meta es construir, desde sus cimientos, un formalismo que nos permita no solo describir una relación aparente, sino también predecir valores futuros.</p>
 
-            <h2>Model Architecture</h2>
-            <p>Let us start by picturing how to architecture of the model is. From this, we can take a look at the following image:</p>
-            <p><em>[HERE WILL BE AN IMAGE]</em></p>
-            <p>As the image shows, the architecture is rather simple.</p>
-            <p>First, we multiply each of the "feature" values (mathematically, those are variables, but in the context of machine leaning, we call them features) with its corresponding "weight" value (again, technically those are variables, but in this context, we call them weights), sum those products up and then add a last value, called "bias".</p>
-            <p>That final value is the corresponding prediction of our model based on the inputs.</p>
+            <h2>Formalización de los Datos: Definiendo Nuestros Objetos Matemáticos</h2>
+            <p>Para abordar este problema con el rigor que merece, primero debemos definir la estructura de nuestros datos en un lenguaje puramente matemático. Desde esta perspectiva, trataremos todos nuestros conjuntos de datos como objetos matemáticos, específicamente como matrices y vectores. Esta aproximación nos proporciona una generalización poderosa, permitiéndonos extender nuestro razonamiento a múltiples muestras y variables con elegancia.</p>
 
-            <h2>Data</h2>
-            <p><strong><em>IMPORTANT NOTE: in these posts, ALL of the vectors will be treated as matrices.</em></strong></p>
-            <p>First, even though we will analyze the model as we only have one sample with one single feature (something that is almost never the case in machine learning), the fact that we will treat each vector as matrices will, intuitively, let you understand how it works if there are more samples and / or features.</p>
+            <h3>Matriz de Variables Independientes (X)</h3>
+            <p>Consideremos un conjunto de <em>a</em> muestras o ejemplos. Para cada una de estas muestras, observamos <em>b</em> características distintas. En el campo de la inteligencia artificial, estas características a menudo se denominan "features". Sin embargo, desde una perspectiva estrictamente matemática, debemos entenderlas como variables que definen la dimensionalidad de nuestro objeto. Por lo tanto, nuestros datos de entrada se representan como una matriz X de dimensiones <em>a × b</em>.</p>
 
-            <h3>Feature data</h3>
-            <p>The main data we collect is the so called "feature data", that is represented with an X.</p>
-            <p>X will be represented as a matrix, with the first index "a" meaning "number of samples" and the second index "b" meaning "number of features".</p>
-            <p>It is like this:</p>
+            <h3>Matriz de Variables Dependientes (Y)</h3>
+            <p>Para cada una de nuestras <em>a</em> muestras, existe un valor <em>c</em> correspondiente que deseamos aproximar o predecir. Estos valores constituyen nuestra matriz de salida Y, con dimensiones <em>a × c</em>.</p>
+            <p>Nuestro desafío, por lo tanto, es encontrar una transformación matemática que nos permita mapear la matriz de entrada X a la matriz de salida Y de la manera más precisa posible.</p>
+
+            <h2>La Hipótesis Lineal: Modelando la Relación con la Ecuación de una Recta</h2>
+            <p>Si la relación visual entre nuestras variables sugiere una línea recta, la lógica nos dicta explorar la ecuación fundamental que describe dicha forma. En su versión más simple, para una sola muestra y una sola característica, esta relación se expresa como:</p>
             \[
-            X = \begin{bmatrix}
-                3 
-            \end{bmatrix} \rightarrow X \in \mathbb{R}^{1(a) \times 1(b)} 
+            y = wx + b
+            \]
+            <p>donde <em>w</em> representa la pendiente y <em>b</em> la ordenada al origen.</p>
+            <p>Extendiendo esta idea a nuestras estructuras matriciales, postulamos la existencia de una matriz de pesos (<em>W</em>) y una matriz de sesgos (<em>B</em>), también conocida como <em>bias</em>, que definen la transformación lineal.</p>
+
+            <h3>Matriz de Pesos (W)</h3>
+            <p>Esta matriz, de dimensiones <em>b × c</em>, contendrá los coeficientes que ponderan la influencia de cada una de las <em>b</em> variables de entrada sobre cada una de las <em>c</em> variables de salida.</p>
+
+            <h3>Matriz de Sesgo (B)</h3>
+            <p>Esta matriz, de dimensiones <em>a × c</em>, representa el término de la ordenada al origen, un desplazamiento constante para cada muestra y clase.</p>
+
+            <p>Así, nuestra hipótesis inicial se formaliza en la siguiente ecuación matricial. Esta operación, que denominaremos nuestro "Pase hacia Adelante" (<em>Forward Pass</em>), constituye el núcleo de nuestro modelo predictivo:</p>
+
+            \[
+            Z = XW + B
             \]
 
-            <h3>Objective value data</h3>
-            <p>The corresponding data associated with the feature data contains the value at which the model should aim. This data is represented with a Y.</p>
-            <p>Y will be represented as a matrix also, with the first index "a" meaning "number of samples" and the second index "c" meaning the "number of objective values".</p>
-            <p>It is like this:</p>
-            \[
-            Y = \begin{bmatrix}
-                3 
-            \end{bmatrix} \rightarrow Y \in \mathbb{R}^{1(a) \times 1(c)}
-            \]
+            <p>Donde <em>Z</em> es la matriz resultante de nuestras predicciones. Nuestro objetivo ahora es claro: debemos encontrar los valores óptimos para las matrices <em>W</em> y <em>B</em> de tal forma que la diferencia entre nuestras predicciones (<em>Z</em>) y los valores reales (<em>Y</em>) sea mínima. Este será el siguiente paso en nuestro viaje para "descubrir" la regresión lineal.</p>
         </article>
         
         <nav class="post-nav">
