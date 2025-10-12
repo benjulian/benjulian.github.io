@@ -41,7 +41,7 @@
             <p>El propósito del "aprendizaje" en este modelo es, precisamente, encontrar los valores numéricos para los tensores \(W\) y \(B\) que hagan que nuestras predicciones, \(Z\), sean lo más cercanas posible a los valores reales observados, que llamaremos \(Y\). Para lograr esto, nos embarcamos en un proceso iterativo conocido como el <strong>Ciclo de Entrenamiento</strong> (<em>Training Cycle</em>). Este ciclo, que exploraremos en detalle a lo largo de este artículo, se compone de cuatro etapas conceptuales:</p>
             <ol>
                 <li><strong>Forward Pass (Paso hacia adelante):</strong> Utilizando una estimación inicial de \(W\) y \(B\), aplicamos la ecuación del modelo a nuestros datos de entrada \(X\) para generar un conjunto de predicciones \(Z\).</li>
-                <li><strong>Loss Computation (Cálculo de la Périda):</strong> Medimos qué tan erróneas son nuestras predicciones comparando \(Z\) con los valores verdaderos \(Y\). Esta medida de error se cuantifica en un único valor escalar llamado "périda" (<em>loss</em>).</li>
+                <li><strong>Loss Computation (Cálculo de la Périda):</strong> Medimos qué tan erróneas son nuestras predicciones comparando \(Z\) con los valores verdaderos \(Y\). Esta medida de error se cuantifica en un único valor escalar llamado "pérdida" (<em>loss</em>).</li>
                 <li><strong>Backward Pass (Paso hacia atrás):</strong> Aquí es donde interviene el cálculo. Determinamos cómo un pequeño cambio en cada uno de los parámetros de \(W\) y \(B\) afectaría la pérdida total. Este proceso nos da los gradientes, que nos indican la dirección en la que debemos ajustar nuestros parámetros para reducir el error.</li>
                 <li><strong>Optimization (Optimización):</strong> Finalmente, actualizamos los valores de \(W\) y \(B\) moviéndolos ligeramente en la dirección opuesta a sus gradientes, acercándonos un paso más a la configuración óptima que minimiza el error.</li>
             </ol>
@@ -163,10 +163,8 @@
             <p>El primer paso, común a ambos gradientes de parámetros, es calcular cómo cambia la pérdida con respecto a un cambio en una predicción \(Z_{ac}\). Para construir el tensor de gradientes \(\frac{\partial \text{MSE}}{\partial Z}\), calculamos la derivada para un elemento genérico \(\frac{\partial \text{MSE}}{\partial Z_{a'c'}}\).</p>
             <p>Partimos de la definición del MSE:</p>
             \[ \text{MSE} = \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} (Z_{ac} - Y_{ac})^2 \]
-            <p>Aplicamos la derivada \(\frac{\partial}{\partial Z_{a'c'}}\) a toda la expresión.</p>
-            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{\partial}{\partial Z_{a'c'}} \left( \frac{1}{a} \sum_{a=1}^{a} \sum_{c=1}^{c} (Z_{ac} - Y_{ac})^2 \right) \] 
-            </p> El termino \( \frac{1}{a} \) es una constante multiplicando, por lo que puede salir fuera del variable de diferenciacion. A su vez, la derivada puede pasar a través de la suma:</p>
-            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{a} \sum_{a,c} \frac{\partial}{\partial Z_{a'c'}} (Z_{ac} - Y_{ac})^2 \]
+            <p>Aplicamos la derivada \(\frac{\partial}{\partial Z_{a'c'}}\) a toda la expresión. La derivada puede pasar a través de la suma:</p>
+            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a,c} \frac{\partial}{\partial Z_{a'c'}} (Z_{ac} - Y_{ac})^2 \]
             <p>Usando la regla de la cadena, la derivada del término al cuadrado es:</p>
             \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a,c} 2(Z_{ac} - Y_{ac}) \cdot \frac{\partial (Z_{ac} - Y_{ac})}{\partial Z_{a'c'}} \]
             <p>La derivada del término interno, \(\frac{\partial Z_{ac}}{\partial Z_{a'c'}}\), es 1 si y solo si los índices coinciden (\(a=a'\) y \(c=c'\)), y 0 en caso contrario. Esta es precisamente la definición del producto de dos <strong>Deltas de Kronecker</strong>: \(\delta_{aa'} \delta_{cc'}\).</p>
@@ -195,6 +193,39 @@
             \[ \frac{\partial Z_{ac}}{\partial B_{a'c'}} = \delta_{aa'} \delta_{cc'} \]
             <p>Hemos derivado con éxito las expresiones para los componentes de nuestros gradientes. Sin embargo, si observamos las fórmulas completas de la regla de la cadena, vemos que implican sumas sobre múltiples índices y la manipulación de tensores de 4º orden (por ejemplo, \(\frac{\partial Z_{ac}}{\partial W_{b'c'}}\) es un tensor con cuatro índices). Implementar esto directamente sería extremadamente ineficiente.</p>
             <p>Afortunadamente, la estructura de estas ecuaciones y las propiedades del Delta de Kronecker nos permiten simplificar drásticamente estas operaciones, reduciéndolas a multiplicaciones de matrices eficientes, como veremos a continuación.</p>
+
+            <hr>
+
+            <h3><strong>De la Teoría a la Práctica: Simplificación del Backward Pass</strong></h3>
+            <p>En la sección anterior, derivamos con éxito las expresiones para los gradientes de la pérdida con respecto a cada uno de nuestros parámetros. Sin embargo, nos encontramos con un dilema computacional. La aplicación directa de la regla de la cadena, tal como la formulamos, implica la creación conceptual de tensores de 4º orden (por ejemplo, \(\frac{\partial Z_{ac}}{\partial W_{b'c'}}\)). Estos objetos matemáticos, aunque teóricamente correctos, serían desastrosos en la práctica. Serían "súper dispersos", es decir, estarían llenos casi en su totalidad de ceros, ocupando una cantidad masiva de memoria para almacenar muy poca información útil.</p>
+            <p>Afortunadamente, no necesitamos construir estos tensores. La belleza de la notación de Einstein y las propiedades del Delta de Kronecker nos permiten simplificar algebraicamente estas complejas expresiones, reduciéndolas a operaciones de tensores de rango 2 (matrices) que son la base del cálculo numérico eficiente.</p>
+            
+            <h4><strong>Simplificación del Gradiente de los Pesos (\(\frac{\partial \text{MSE}}{\partial W}\))</strong></h4>
+            <p>Comencemos con la expresión completa de la regla de la cadena para un único elemento del gradiente de los pesos, \(\frac{\partial \text{MSE}}{\partial W_{b'c'}}\):</p>
+            \[ \frac{\partial \text{MSE}}{\partial W_{b'c'}} = \sum_{a=1}^{a} \sum_{c=1}^{c} \frac{\partial \text{MSE}}{\partial Z_{ac}} \frac{\partial Z_{ac}}{\partial W_{b'c'}} \]
+            <p>Ahora, sustituimos la expresión que ya encontramos para \(\frac{\partial Z_{ac}}{\partial W_{b'c'}}\), que es \(X_{ab'} \delta_{cc'}\):</p>
+            \[ \frac{\partial \text{MSE}}{\partial W_{b'c'}} = \sum_{a=1}^{a} \sum_{c=1}^{c} \frac{\partial \text{MSE}}{\partial Z_{ac}} (X_{ab'} \delta_{cc'}) \]
+            <p>Aquí es donde ocurre la primera simplificación. Como se anota en nuestro desarrollo manuscrito, el Delta de Kronecker \(\delta_{cc'}\) actúa como un filtro sobre la suma interna en \(c\). Anula todos los términos de la suma excepto el único en el que \(c = c'\). Esto nos permite <strong>colapsar la suma sobre \(c\)</strong> y, en el proceso, <strong>sustituir el índice \(c\) por \(c'\)</strong> en el resto de la expresión:</p>
+            \[ \frac{\partial \text{MSE}}{\partial W_{b'c'}} = \sum_{a=1}^{a} \frac{\partial \text{MSE}}{\partial Z_{ac'}} X_{ab'} \]
+            <p>Analicemos esta expresión resultante. Para calcular un único elemento del gradiente, indexado por \((b', c')\), estamos realizando una suma sobre el índice de las muestras, \(a\). Los dos términos dentro de la suma, \(\frac{\partial \text{MSE}}{\partial Z_{ac'}}\) y \(X_{ab'}\), son elementos de dos tensores de rango 2 (matrices). Una suma sobre un índice repetido entre dos tensores de esta manera es, por definición, la operación que construye un elemento de una multiplicación de matrices.</p>
+            <p>Si esta suma calcula un solo elemento, entonces la operación para calcular el tensor de gradiente completo, \(\frac{\partial \text{MSE}}{\partial W}\), debe ser una multiplicación de matrices. Sin embargo, debemos ser cuidadosos con las dimensiones. Tenemos el tensor \(X\) con dimensiones \((a \times b)\) y el tensor \(\frac{\partial \text{MSE}}{\partial Z}\) con dimensiones \((a \times c)\). Para producir un tensor de gradiente con las dimensiones correctas de \(W\), que son \((b \times c)\), la operación matricial correcta es multiplicar la transpuesta de \(X\) por el gradiente intermedio:</p>
+            \[ \frac{\partial \text{MSE}}{\partial W} = (X)^T \left( \frac{\partial \text{MSE}}{\partial Z} \right) \]
+            <p>Verificamos las dimensiones: \((b \times a) \cdot (a \times c) \rightarrow (b \times c)\). La operación es dimensionalmente consistente y computacionalmente eficiente.</p>
+            
+            <h4><strong>Simplificación del Gradiente del Sesgo (\(\frac{\partial \text{MSE}}{\partial B}\))</strong></h4>
+            <p>Sigamos un proceso similar para el gradiente del sesgo. Partimos de la expresión de la regla de la cadena para un elemento \(\frac{\partial \text{MSE}}{\partial B_{a'c'}}\):</p>
+            \[ \frac{\partial \text{MSE}}{\partial B_{a'c'}} = \sum_{a=1}^{a} \sum_{c=1}^{c} \frac{\partial \text{MSE}}{\partial Z_{ac}} \frac{\partial Z_{ac}}{\partial B_{a'c'}} \]
+            <p>Sustituimos la expresión que encontramos para \(\frac{\partial Z_{ac}}{\partial B_{a'c'}}\), que es el producto de dos Deltas de Kronecker, \(\delta_{aa'} \delta_{cc'}\):</p>
+            \[ \frac{\partial \text{MSE}}{\partial B_{a'c'}} = \sum_{a=1}^{a} \sum_{c=1}^{c} \frac{\partial \text{MSE}}{\partial Z_{ac}} (\delta_{aa'} \delta_{cc'}) \]
+            <p>Aquí, la simplificación es aún más dramática. El delta \(\delta_{cc'}\) colapsa la suma sobre \(c\), reemplazando \(c\) por \(c'\). Inmediatamente después, el delta \(\delta_{aa'}\) colapsa la suma restante sobre \(a\), reemplazando \(a\) por \(a'\). Ambas sumas desaparecen, dejándonos con un resultado sorprendentemente simple:</p>
+            \[ \frac{\partial \text{MSE}}{\partial B_{a'c'}} = \frac{\partial \text{MSE}}{\partial Z_{a'c'}} \]
+            <p>En su forma tensorial, esto implica que el gradiente de la pérdida con respecto al sesgo es simplemente el gradiente intermedio que ya habíamos calculado. En implementaciones prácticas, a menudo se realiza un paso adicional de sumar o promediar este gradiente a lo largo del eje de las muestras (\(a\)) para obtener un único vector de gradiente de tamaño \(c\), que corresponde a la naturaleza conceptual de nuestro sesgo.</p>
+            
+            <h4><strong>Conclusión: La Elegancia del Cálculo Eficiente</strong></h4>
+            <p>Hemos completado nuestro viaje. Partimos de una hipótesis lineal, la formalizamos con tensores, calculamos la pérdida y luego nos sumergimos en el cálculo para encontrar los gradientes. El paso final y más crucial fue demostrar cómo las complejas expresiones derivadas de la regla de la cadena se simplifican a operaciones matriciales limpias y eficientes:</p>
+            \[ \frac{\partial \text{MSE}}{\partial W} = (X)^T \left( \frac{2(Z - Y)}{n} \right) \]
+            \[ \frac{\partial \text{MSE}}{\partial B} = \frac{2(Z - Y)}{n} \]
+            <p>La clave de esta simplificación, como se insinúa en nuestro desarrollo, es que la derivada de una transformación lineal es inherentemente esparsa. El Delta de Kronecker es la herramienta matemática que nos permite explotar esta esparsidad algebraicamente, eludiendo por completo la necesidad de construir tensores intermedios masivos e ineficientes. Con estas fórmulas, tenemos todo lo necesario para implementar un ciclo de optimización y entrenar nuestro modelo de Regresión Lineal.</p>
 
         </article>
         
