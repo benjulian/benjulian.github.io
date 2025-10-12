@@ -102,6 +102,26 @@
             </ul>
             <p>Con nuestros cuatro tensores fundamentales —\(X\), \(Y\), \(W\) y \(B\)— ahora definidos, hemos sentado las bases para construir el modelo. El siguiente paso es ponerlos en acción en el <strong>Forward Pass</strong>, el proceso de combinar los datos de entrada con los parámetros para generar nuestra primera predicción.</p>
 
+            <hr>
+
+            <h3><strong>El Forward Pass: De los Datos a la Predicción</strong></h3>
+            <p>Una vez definidos nuestros tensores, podemos ejecutar el primer paso computacional del ciclo de entrenamiento: el <strong>Forward Pass</strong> o paso hacia adelante. El objetivo de esta fase es tomar nuestros datos de entrada, \(X\), y combinarlos con el estado actual de los parámetros del modelo, \(W\) y \(B\), para generar un conjunto de predicciones. Es en este momento donde la información "fluye" desde la entrada, a través de la estructura matemática del modelo, hasta producir una salida.</p>
+            <p>La operación que define este proceso es la transformación lineal que postulamos en nuestra hipótesis inicial. Su formalización matemática, extraída directamente de nuestro desarrollo, es la siguiente:</p>
+            \[ Z_{ac} = X_{ab}W_{bc} + B_{ac} \]
+            <p>Esta ecuación define el tensor de salida de nuestro modelo, \(Z\), el cual, por construcción, tendrá las mismas dimensiones que nuestro tensor objetivo \(Y\), es decir, \(Z \in \mathbb{R}^{a \times c}\). Analicemos cada componente de esta operación fundamental.</p>
+            
+            <h4><strong>La Suma Ponderada de Características</strong></h4>
+            <p>El núcleo de la ecuación reside en el término \(X_{ab}W_{bc}\). Siguiendo la convención de notación de Einstein, observamos que el índice \(b\) se repite. Esto nos indica que debemos realizar una suma sobre todas las dimensiones de las características. De forma explícita, la operación es:</p>
+            \[ \sum_{b=1}^{b} X_{ab}W_{bc} \]
+            <p>Conceptualmente, esta operación calcula una <strong>suma ponderada</strong>. Para una muestra específica \(a\) y una clase de salida \(c\), el modelo recorre cada una de las \(b\) características de esa muestra. El valor de cada característica, \(X_{ab}\), se multiplica por su peso correspondiente, \(W_{bc}\), que lo conecta con la clase de salida \(c\). El resultado de la suma es la contribución agregada de todas las características a la predicción final para esa muestra y esa clase. Los índices que no se suman, \(a\) y \(c\), se conocen como índices "libres" y determinan la forma del tensor resultante de esta multiplicación.</p>
+            
+            <h4><strong>La Incorporación del Sesgo</strong></h4>
+            <p>Una vez calculada esta suma ponderada, el segundo paso es añadir el término de sesgo, \(+ B_{ac}\). Esta es una simple adición elemento a elemento. Como recordaremos de nuestra definición de \(B\), el valor de \(B_{ac}\) es constante para todas las muestras \(a\) dentro de una misma columna (o clase) \(c\). La función de este término es crucial: permite que el hiperplano de nuestro modelo se desplace verticalmente, otorgándole la flexibilidad necesaria para ajustarse a datos que no están centrados en el origen.</p>
+            
+            <h4><strong>El Resultado: El Tensor de Predicciones Lineales</strong></h4>
+            <p>El resultado final de esta operación es el tensor \(Z \in \mathbb{R}^{a \times c}\), al que nos referiremos como el <strong>tensor de predicciones lineales</strong> o las <strong>salidas crudas del modelo</strong>. Cada elemento escalar \(Z_{ac}\) representa la predicción directa y sin transformar del modelo para la \(a\)-ésima muestra y la \(c\)-ésima clase.</p>
+            <p>Hemos completado con éxito el primer paso: hemos transformado nuestra entrada en una salida. Sin embargo, esta predicción se ha generado utilizando parámetros \(W\) y \(B\) que, al inicio, son probablemente aleatorios y, por tanto, incorrectos. El siguiente paso lógico e indispensable es cuantificar exactamente <em>cuán</em> incorrectas son estas predicciones. Para ello, debemos introducir una <strong>función de pérdida</strong>.</p>
+            
         </article>
         
         <nav class="post-nav">
