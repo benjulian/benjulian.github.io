@@ -134,4 +134,80 @@
                 <br>
                 <li><strong>El Error al Cuadrado: \((\dots)^2\)</strong><br>A continuación, elevamos esta diferencia al cuadrado. Este paso es crucial por dos razones. Primero, <strong>garantiza la positividad</strong>: al elevar al cuadrado, todos los errores (tanto si la predicción fue demasiado alta como demasiado baja) se convierten en valores positivos. Esto evita que errores de signo opuesto se anulen entre sí al sumarlos. Segundo, <strong>penaliza desproporcionadamente los errores grandes</strong>: un error de magnitud 2 contribuye con 4 a la pérdida total, mientras que un error de 10 contribuye con 100. Este comportamiento empuja al algoritmo de optimización a priorizar la corrección de las desviaciones más graves.</li>
                 <br>
-                <li><strong>La Suma Total: \(\sum_{a=1}^{a} \sum_{c=1}^{c}\)</strong><br>La doble sumatoria agrega todos estos errores cuadráticos individuales. Mientras que la suma sobre las muestras \(a\) es intuitiva —simplemente estamos acumulando el error de cada una de las observaciones en nuestro conjunto de datos—, la suma sobre las clases \(c\) merece una atención especial.<br>Nuestro formalismo es general, diseñado para manejar modelos que pueden predecir mú
+                <li><strong>La Suma Total: \(\sum_{a=1}^{a} \sum_{c=1}^{c}\)</strong><br>La doble sumatoria agrega todos estos errores cuadráticos individuales. Mientras que la suma sobre las muestras \(a\) es intuitiva —simplemente estamos acumulando el error de cada una de las observaciones en nuestro conjunto de datos—, la suma sobre las clases \(c\) merece una atención especial.<br>Nuestro formalismo es general, diseñado para manejar modelos que pueden predecir múltiples valores simultáneamente (lo que se conoce como regresión multivariable). Imaginemos un caso en el que, para una entrada, predecimos tanto una altura como un ancho. Para esa única muestra, tendríamos un error en la predicción de la altura y otro en la del ancho. La función de pérdida debe consolidar estos errores en un único número que represente el rendimiento para esa muestra. La suma interna sobre \(c\) logra precisamente esto: <strong>agrega los errores cuadráticos de todas las dimensiones de salida para una muestra dada</strong>, dándonos el error total para esa única observación. Posteriormente, la suma externa sobre \(a\) acumula estos errores por muestra para obtener el error cuadrático total de todo el conjunto de datos.</li>
+                <br>
+                <li><strong>El Promedio: \(\frac{1}{n}\)</strong><br>Finalmente, dividimos la suma total por \(n\). Este término es una constante de normalización, donde \(n\) suele ser el número de muestras (\(a\)) o el número total de elementos (\(a \times c\)). Su propósito es hacer que el valor de la pérdida sea independiente del tamaño del lote de datos que estemos utilizando. Esto nos permite comparar de manera justa el rendimiento del modelo entre diferentes iteraciones o con diferentes conjuntos de datos.</li>
+            </ol>
+            
+            <h4><strong>El Objetivo Final: Minimizar la Pérdida</strong></h4>
+            <p>Es vital entender que el valor escalar del MSE no es simplemente una métrica de reporte. Es el <strong>objetivo central de nuestra optimización</strong>. Todo el proceso de entrenamiento se puede resumir en una sola meta: encontrar la combinación de parámetros en los tensores \(W\) y \(B\) que haga que el valor de esta función de pérdida sea lo más pequeño posible.</p>
+            <p>Esto nos lleva a la pregunta que impulsa el resto de nuestro análisis: si tenemos un valor de pérdida, ¿cómo sabemos en qué dirección debemos ajustar los miles o millones de parámetros en \(W\) y \(B\) para reducirla? La respuesta no está en la intuición, sino en el cálculo diferencial. Necesitamos determinar la influencia de cada parámetro individual en el error total. Este es el propósito del <strong>Backward Pass</strong>.</p>
+        
+            <hr>
+
+            <h3><strong>El Backward Pass: Rastreando la Influencia de Cada Parámetro</strong></h3>
+            <p>Hemos cuantificado el error de nuestro modelo en un único escalar: la pérdida (MSE). Ahora nos enfrentamos a la pregunta central del aprendizaje: ¿cómo ajustamos los millones de parámetros en \(W\) y \(B\) para minimizar esta pérdida? La respuesta reside en el <strong>Backward Pass</strong>, un proceso elegante que utiliza el cálculo diferencial para determinar la contribución de cada parámetro individual al error total.</p>
+            <p>El objetivo es calcular las derivadas parciales de la pérdida con respecto a cada elemento de nuestros tensores de parámetros. Estas derivadas, conocidas como gradientes, nos indicarán la dirección de máximo ascenso de la función de pérdida. Para minimizarla, simplemente daremos un pequeño paso en la dirección opuesta.</p>
+            <p>Para mantener la consistencia dimensional, adoptaremos la <strong>convención de diseño del numerador</strong> (<em>numerator layout</em>). Esto significa que el resultado de una derivada tendrá la misma forma que la variable en el denominador. Por ejemplo, el tensor de gradientes \(\frac{\partial \text{MSE}}{\partial W}\) será una matriz de dimensiones \(b \times c\), exactamente como \(W\). Nuestros objetivos finales son, por tanto, calcular los tensores completos \(\frac{\partial \text{MSE}}{\partial W}\) y \(\frac{\partial \text{MSE}}{\partial B}\).</p>
+            
+            <h4><strong>La Estrategia y una Aclaración Notacional Crucial</strong></h4>
+            <p>Observando el diagrama de "Paths of Influence" en nuestro desarrollo, vemos que los parámetros \(W\) y \(B\) no afectan la pérdida directamente. Su influencia es indirecta, mediada por el tensor de predicciones \(Z\). Esta estructura de dependencias nos obliga a usar la <strong>regla de la cadena</strong> del cálculo multivariable.</p>
+            <p>Antes de aplicar la regla, debemos hacer una aclaración notacional fundamental. Al calcular la derivada de una función que contiene sumas (como el MSE o \(Z_{ac}\)) con respecto a un elemento específico de un tensor (por ejemplo, un peso particular), debemos distinguir entre los índices de la suma y los índices del elemento por el cual derivamos.</p>
+            <ul>
+                <li>Los índices dentro de una suma (\(a, b, c\)) son variables "mudas" o locales a esa suma.</li>
+                <li>Los índices del elemento por el cual derivamos son "fijos" y definen una coordenada específica en el tensor de gradientes.</li>
+            </ul>
+            <p>Para evitar ambigüedad, usaremos un apóstrofo (') para los índices fijos, tal como se hace en el documento fuente. Así, calcularemos \(\frac{\partial \text{MSE}}{\partial W_{b'c'}}\) para encontrar el elemento en la fila \(b'\) y la columna \(c'\) del gradiente de los pesos.</p>
+            
+            <h4><strong>Paso 1: El Gradiente Intermedio \(\frac{\partial \text{MSE}}{\partial Z_{ac}}\)</strong></h4>
+            <p>El primer paso, común a ambos gradientes de parámetros, es calcular cómo cambia la pérdida con respecto a un cambio en una predicción \(Z_{ac}\). Para construir el tensor de gradientes \(\frac{\partial \text{MSE}}{\partial Z}\), calculamos la derivada para un elemento genérico \(\frac{\partial \text{MSE}}{\partial Z_{a'c'}}\).</p>
+            <p>Partimos de la definición del MSE:</p>
+            \[ \text{MSE} = \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} (Z_{ac} - Y_{ac})^2 \]
+            <p>Aplicamos la derivada \(\frac{\partial}{\partial Z_{a'c'}}\) a toda la expresión. La derivada puede pasar a través de la suma:</p>
+            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a,c} \frac{\partial}{\partial Z_{a'c'}} (Z_{ac} - Y_{ac})^2 \]
+            <p>Usando la regla de la cadena, la derivada del término al cuadrado es:</p>
+            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a,c} 2(Z_{ac} - Y_{ac}) \cdot \frac{\partial (Z_{ac} - Y_{ac})}{\partial Z_{a'c'}} \]
+            <p>La derivada del término interno, \(\frac{\partial Z_{ac}}{\partial Z_{a'c'}}\), es 1 si y solo si los índices coinciden (\(a=a'\) y \(c=c'\)), y 0 en caso contrario. Esta es precisamente la definición del producto de dos <strong>Deltas de Kronecker</strong>: \(\delta_{aa'} \delta_{cc'}\).</p>
+            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a,c} 2(Z_{ac} - Y_{ac}) \cdot \delta_{aa'} \delta_{cc'} \]
+            <p>El Delta de Kronecker tiene una propiedad fundamental: cuando multiplica a una expresión dentro de una suma, <strong>colapsa la suma</strong>. La presencia de \(\delta_{aa'}\) hace que todos los términos de la suma sobre \(a\) se anulen, excepto el único término donde \(a=a'\). Lo mismo ocurre con \(\delta_{cc'}\) y la suma sobre \(c\). Como resultado, las sumas desaparecen y los índices mudos \(a\) y \(c\) son <strong>sustituidos</strong> por los índices fijos \(a'\) y \(c'\):</p>
+            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \cdot 2(Z_{a'c'} - Y_{a'c'}) \]
+            <p>Al generalizar esto de un elemento específico a la forma tensorial completa (reemplazando \(a', c'\) por \(a, c\)), obtenemos nuestro gradiente intermedio:</p>
+            \[ \frac{\partial \text{MSE}}{\partial Z} = \frac{2(Z - Y)}{n} \]
+            
+            <h4><strong>Paso 2: El Gradiente de los Pesos \(\frac{\partial \text{MSE}}{\partial W}\)</strong></h4>
+            <p>Ahora aplicamos la regla de la cadena para encontrar el gradiente con respecto a un peso genérico \(W_{b'c'}\). La influencia de \(W_{b'c'}\) se propaga a través de todos los elementos de \(Z\), por lo que debemos sumar todas estas contribuciones:</p>
+            \[ \frac{\partial \text{MSE}}{\partial W_{b'c'}} = \sum_{a,c} \frac{\partial \text{MSE}}{\partial Z_{ac}} \frac{\partial Z_{ac}}{\partial W_{b'c'}} \]
+            <p>Ya conocemos el primer término. Nos enfocamos en el segundo: \(\frac{\partial Z_{ac}}{\partial W_{b'c'}}\). Partimos de la definición de \(Z_{ac}\):</p>
+            \[ \frac{\partial Z_{ac}}{\partial W_{b'c'}} = \frac{\partial}{\partial W_{b'c'}} \left( \sum_{b} X_{ab}W_{bc} + B_{ac} \right) \]
+            <p>El término \(B_{ac}\) es constante con respecto a \(W\), por lo que su derivada es 0. Dentro de la suma, \(X_{ab}\) es un multiplicador constante. La derivada de \(W_{bc}\) con respecto a \(W_{b'c'}\) es, nuevamente, un Delta de Kronecker: \(\delta_{bb'} \delta_{cc'}\).</p>
+            \[ \frac{\partial Z_{ac}}{\partial W_{b'c'}} = \sum_{b} X_{ab} (\delta_{bb'} \delta_{cc'}) \]
+            <p>El delta \(\delta_{bb'}\) colapsa la suma sobre \(b\), sustituyendo el índice \(b\) por \(b'\). El delta \(\delta_{cc'}\) simplemente permanece.</p>
+            \[ \frac{\partial Z_{ac}}{\partial W_{b'c'}} = X_{ab'} \delta_{cc'} \]
+            
+            <h4><strong>Paso 3: El Gradiente del Sesgo \(\frac{\partial \text{MSE}}{\partial B}\)</strong></h4>
+            <p>El proceso para el sesgo es análogo. Aplicamos la regla de la cadena:</p>
+            \[ \frac{\partial \text{MSE}}{\partial B_{a'c'}} = \sum_{a,c} \frac{\partial \text{MSE}}{\partial Z_{ac}} \frac{\partial Z_{ac}}{\partial B_{a'c'}} \]
+            <p>Calculamos la derivada de \(Z_{ac}\) con respecto a un elemento genérico del sesgo, \(B_{a'c'}\):</p>
+            \[ \frac{\partial Z_{ac}}{\partial B_{a'c'}} = \frac{\partial}{\partial B_{a'c'}} \left( \sum_{b} X_{ab}W_{bc} + B_{ac} \right) \]
+            <p>Aquí, el término de la suma es constante y su derivada es 0. La derivada de \(B_{ac}\) con respecto a \(B_{a'c'}\) es simplemente \(\delta_{aa'} \delta_{cc'}\).</p>
+            \[ \frac{\partial Z_{ac}}{\partial B_{a'c'}} = \delta_{aa'} \delta_{cc'} \]
+            <p>Hemos derivado con éxito las expresiones para los componentes de nuestros gradientes. Sin embargo, si observamos las fórmulas completas de la regla de la cadena, vemos que implican sumas sobre múltiples índices y la manipulación de tensores de 4º orden (por ejemplo, \(\frac{\partial Z_{ac}}{\partial W_{b'c'}}\) es un tensor con cuatro índices). Implementar esto directamente sería extremadamente ineficiente.</p>
+            <p>Afortunadamente, la estructura de estas ecuaciones y las propiedades del Delta de Kronecker nos permiten simplificar drásticamente estas operaciones, reduciéndolas a multiplicaciones de matrices eficientes, como veremos a continuación.</p>
+
+        </article>
+        
+        <nav class="post-nav">
+            <a href="../index.html" class="back-link">&larr; Volver al inicio</a>
+        </nav>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 - Benjamin Julian</p>
+    </footer>
+
+    <!-- Script de Prism.js (debe ir al final del body) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+</body>
+</html>
