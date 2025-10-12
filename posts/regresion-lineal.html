@@ -221,12 +221,6 @@
             \[ \frac{\partial \text{MSE}}{\partial B_{a'c'}} = \frac{\partial \text{MSE}}{\partial Z_{a'c'}} \]
             <p>En su forma tensorial, esto implica que el gradiente de la pérdida con respecto al sesgo es simplemente el gradiente intermedio que ya habíamos calculado. En implementaciones prácticas, a menudo se realiza un paso adicional de sumar o promediar este gradiente a lo largo del eje de las muestras (\(a\)) para obtener un único vector de gradiente de tamaño \(c\), que corresponde a la naturaleza conceptual de nuestro sesgo.</p>
             
-            <h4><strong>Conclusión: La Elegancia del Cálculo Eficiente</strong></h4>
-            <p>Hemos completado nuestro viaje. Partimos de una hipótesis lineal, la formalizamos con tensores, calculamos la pérdida y luego nos sumergimos en el cálculo para encontrar los gradientes. El paso final y más crucial fue demostrar cómo las complejas expresiones derivadas de la regla de la cadena se simplifican a operaciones matriciales limpias y eficientes:</p>
-            \[ \frac{\partial \text{MSE}}{\partial W} = (X)^T \left( \frac{2(Z - Y)}{n} \right) \]
-            \[ \frac{\partial \text{MSE}}{\partial B} = \frac{2(Z - Y)}{n} \]
-            <p>La clave de esta simplificación, como se insinúa en nuestro desarrollo, es que la derivada de una transformación lineal es inherentemente esparsa. El Delta de Kronecker es la herramienta matemática que nos permite explotar esta esparsidad algebraicamente, eludiendo por completo la necesidad de construir tensores intermedios masivos e ineficientes. Con estas fórmulas, tenemos todo lo necesario para implementar un ciclo de optimización y entrenar nuestro modelo de Regresión Lineal.</p>
-
             <hr>
 
             <h3><strong>Optimización: Cerrando el Ciclo con Descenso de Gradiente</strong></h3>
