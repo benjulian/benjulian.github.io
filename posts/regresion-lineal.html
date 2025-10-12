@@ -41,12 +41,66 @@
             <p>El propósito del "aprendizaje" en este modelo es, precisamente, encontrar los valores numéricos para los tensores \(W\) y \(B\) que hagan que nuestras predicciones, \(Z\), sean lo más cercanas posible a los valores reales observados, que llamaremos \(Y\). Para lograr esto, nos embarcamos en un proceso iterativo conocido como el <strong>Ciclo de Entrenamiento</strong> (<em>Training Cycle</em>). Este ciclo, que exploraremos en detalle a lo largo de este artículo, se compone de cuatro etapas conceptuales:</p>
             <ol>
                 <li><strong>Forward Pass (Paso hacia adelante):</strong> Utilizando una estimación inicial de \(W\) y \(B\), aplicamos la ecuación del modelo a nuestros datos de entrada \(X\) para generar un conjunto de predicciones \(Z\).</li>
-                <li><strong>Loss Computation (Cálculo de la Périda):</strong> Medimos qué tan erróneas son nuestras predicciones comparando \(Z\) con los valores verdaderos \(Y\). Esta medida de error se cuantifica en un único valor escalar llamado "pérdida" (<em>loss</em>).</li>
+                <li><strong>Loss Computation (Cálculo de la Périda):</strong> Medimos qué tan erróneas son nuestras predicciones comparando \(Z\) con los valores verdaderos \(Y\). Esta medida de error se cuantifica en un único valor escalar llamado "périda" (<em>loss</em>).</li>
                 <li><strong>Backward Pass (Paso hacia atrás):</strong> Aquí es donde interviene el cálculo. Determinamos cómo un pequeño cambio en cada uno de los parámetros de \(W\) y \(B\) afectaría la pérdida total. Este proceso nos da los gradientes, que nos indican la dirección en la que debemos ajustar nuestros parámetros para reducir el error.</li>
                 <li><strong>Optimization (Optimización):</strong> Finalmente, actualizamos los valores de \(W\) y \(B\) moviéndolos ligeramente en la dirección opuesta a sus gradientes, acercándonos un paso más a la configuración óptima que minimiza el error.</li>
             </ol>
             <p>Este ciclo se repite una y otra vez, refinando progresivamente los parámetros del modelo hasta que nuestras predicciones sean lo más precisas posible.</p>
             <p>Antes de sumergirnos en la mecánica de este ciclo, es imperativo establecer un lenguaje común. Nuestro primer paso será definir formalmente las estructuras de datos, o tensores, con las que operaremos, estableciendo las convenciones de notación que nos guiarán a través de este desarrollo matemático.</p>
+
+            <hr>
+
+            <h3><strong>Formalización Matemática: Definiendo los Tensores del Modelo</strong></h3>
+            <p>Para construir nuestro modelo de Regresión Lineal sobre una base rigurosa, debemos primero definir con precisión los objetos matemáticos que lo componen. En este contexto, trataremos todas nuestras estructuras de datos —entradas, salidas y parámetros— como <strong>tensores</strong>. Un tensor es una generalización de vectores y matrices a un número arbitrario de dimensiones, y nos proporciona un marco robusto para describir las operaciones de nuestro modelo.</p>
+            <p>Para manipular estos tensores, emplearemos exclusivamente la <strong>notación de Einstein</strong>. Esta convención es a la vez elegante y poderosa: cualquier índice que aparezca repetido en un mismo término implica una suma sobre todos los valores posibles de dicho índice. Por ejemplo, un término como \(X_{ab}W_{bc}\) es una forma compacta de escribir \(\sum_{b} X_{ab}W_{bc}\). Esta notación nos permitirá expresar operaciones complejas, como la multiplicación de matrices, sin la ambigüedad de la notación matricial tradicional, enfocándonos en la interacción entre las dimensiones.</p>
+            
+            <h4><strong>Los Datos: Entrada y Salida</strong></h4>
+            <p>Nuestros datos consisten en dos componentes principales: las observaciones de entrada y los valores objetivo correspondientes.</p>
+            <ul>
+                <li><strong>El Tensor de Entrada \(X\):</strong>
+                    Este tensor contiene el conjunto completo de nuestras observaciones. Lo definimos como un tensor de rango 2 (una matriz) de dimensiones \(a \times b\):
+                    \[ X \in \mathbb{R}^{a \times b} \]
+                    Los índices tienen un significado preciso:
+                    <ul>
+                        <li>El índice \(a\) recorre las <strong>muestras</strong> (<em>samples</em>) de nuestro conjunto de datos, desde \(1\) hasta el número total de observaciones.</li>
+                        <li>El índice \(b\) recorre las <strong>características</strong> (<em>features</em>) que describen cada muestra.</li>
+                    </ul>
+                    Así, un elemento escalar \(X_{ab}\) representa el valor de la \(b\)-ésima característica para la \(a\)-ésima muestra de nuestros datos.
+                </li>
+                <br>
+                <li><strong>El Tensor Objetivo \(Y\):</strong>
+                    Este tensor alberga los valores verdaderos que nuestro modelo aspira a predecir. Al igual que \(X\), es un tensor de rango 2, pero con dimensiones \(a \times c\):
+                    \[ Y \in \mathbb{R}^{a \times c} \]
+                    El significado de sus índices es el siguiente:
+                    <ul>
+                        <li>El índice \(a\) corresponde directamente al índice de muestras de \(X\), asegurando una alineación perfecta entre cada entrada y su salida esperada.</li>
+                        <li>El índice \(c\) recorre las <strong>clases</strong> o variables de salida. En el caso más simple de regresión, \(c\) podría ser 1, pero esta notación nos permite manejar modelos que predicen múltiples valores simultáneamente.</li>
+                    </ul>
+                    Un elemento \(Y_{ac}\) es, por tanto, el valor real de la \(c\)-ésima variable de salida para la \(a\)-ésima muestra.
+                </li>
+            </ul>
+            
+            <h4><strong>Los Parámetros del Modelo: Pesos y Sesgo</strong></h4>
+            <p>Los parámetros del modelo son los valores numéricos que no se derivan de los datos, sino que son "aprendidos" durante el proceso de entrenamiento. Son las "perillas" que ajustaremos para minimizar el error de predicción.</p>
+            <ul>
+                <li><strong>El Tensor de Pesos \(W\):</strong>
+                    El tensor de pesos \(W\) captura la fuerza y el signo de la relación entre cada característica de entrada y cada clase de salida. Se define como un tensor de rango 2 de dimensiones \(b \times c\):
+                    \[ W \in \mathbb{R}^{b \times c} \]
+                    La lógica de sus índices es crucial para la conexión entre entrada y salida:
+                    <ul>
+                        <li>El índice \(b\) se alinea con las \(b\) características del tensor de entrada \(X\).</li>
+                        <li>El índice \(c\) se alinea con las \(c\) clases del tensor de salida \(Y\).</li>
+                    </ul>
+                    De este modo, un elemento escalar \(W_{bc}\) representa el peso que modula la influencia de la \(b\)-ésima característica de entrada sobre la \(c\)-ésima predicción de salida.
+                </li>
+                <br>
+                <li><strong>El Tensor de Sesgo \(B\):</strong>
+                    El tensor de sesgo, también conocido como <em>bias</em> o intercepto, actúa como un término de desplazamiento. Permite que el hiperplano del modelo se ajuste verticalmente, sin necesidad de pasar por el origen del espacio de características. Lo definimos con dimensiones \(a \times c\):
+                    \[ B \in \mathbb{R}^{a \times c} \]
+                    Es fundamental prestar atención a una restricción estructural clave, anotada en nuestro desarrollo manuscrito: <strong>cada columna del tensor \(B\) debe contener el mismo valor</strong>. Esto significa que, aunque lo representamos como una matriz de \(a \times c\) para facilitar las operaciones tensoriales, conceptualmente es un vector de sesgos de tamaño \(c\). El mismo valor de sesgo para una clase específica, digamos \(B_{c}\), se aplica de manera idéntica a todas las \(a\) muestras. Esta estructura es una forma de incorporar la operación de <em>broadcasting</em>, común en las librerías de cálculo numérico, dentro de nuestro formalismo.
+                </li>
+            </ul>
+            <p>Con nuestros cuatro tensores fundamentales —\(X\), \(Y\), \(W\) y \(B\)— ahora definidos, hemos sentado las bases para construir el modelo. El siguiente paso es ponerlos en acción en el <strong>Forward Pass</strong>, el proceso de combinar los datos de entrada con los parámetros para generar nuestra primera predicción.</p>
 
         </article>
         
