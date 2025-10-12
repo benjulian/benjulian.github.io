@@ -166,7 +166,7 @@
             <p>Aplicamos la derivada \(\frac{\partial}{\partial Z_{a'c'}}\) a toda la expresión.</p>
             \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'} = \frac{\partial}{\partial Z_{a'c'} \frac{1}{a} \sum_{a=1}^{a} \sum_{c=1}^{c} (Z_{ac} - Y_{ac})^2 
             </p> El termino \frac{1}{a} es una constante multiplicando, por lo que puede salir fuera del variable de diferenciacion. A su vez, la derivada puede pasar a través de la suma:</p>
-            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a,c} \frac{\partial}{\partial Z_{a'c'}} (Z_{ac} - Y_{ac})^2 \]
+            \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'} = \frac{1}{n} \sum_{a,c} \frac{\partial}{\partial Z_{a'c'}} (Z_{ac} - Y_{ac})^2 \]
             <p>Usando la regla de la cadena, la derivada del término al cuadrado es:</p>
             \[ \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a,c} 2(Z_{ac} - Y_{ac}) \cdot \frac{\partial (Z_{ac} - Y_{ac})}{\partial Z_{a'c'}} \]
             <p>La derivada del término interno, \(\frac{\partial Z_{ac}}{\partial Z_{a'c'}}\), es 1 si y solo si los índices coinciden (\(a=a'\) y \(c=c'\)), y 0 en caso contrario. Esta es precisamente la definición del producto de dos <strong>Deltas de Kronecker</strong>: \(\delta_{aa'} \delta_{cc'}\).</p>
