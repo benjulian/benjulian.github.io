@@ -65,6 +65,18 @@
                         <li>El índice \(a\) recorre las <strong>muestras</strong> (<em>samples</em>) de nuestro conjunto de datos, desde \(1\) hasta el número total de observaciones.</li>
                         <li>El índice \(b\) recorre las <strong>características</strong> (<em>features</em>) que describen cada muestra.</li>
                     </ul>
+
+                    Este tensor se veria (de manera general) asi:
+
+                    \[
+                    X = \begin{bmatrix}
+                        X_{11} & X_{12} & \cdots & X_{1b} \\
+                        X_{21} & X_{22} & \cdots & X_{2b} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        X_{a1} & X_{a2} & \cdots & X_{ab}
+                    \end{bmatrix}
+                    \]
+                    
                     Así, un elemento escalar \(X_{ab}\) representa el valor de la \(b\)-ésima característica para la \(a\)-ésima muestra de nuestros datos.
                 </li>
                 <br>
