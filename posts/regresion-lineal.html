@@ -70,10 +70,10 @@
 
                     \[
                     X = \begin{bmatrix}
-                        X_{11} & X_{12} & \cdots & X_{1b} \\
-                        X_{21} & X_{22} & \cdots & X_{2b} \\
+                        x_{11} & x_{12} & \cdots & x_{1b} \\
+                        x_{21} & x_{22} & \cdots & x_{2b} \\
                         \vdots & \vdots & \ddots & \vdots \\
-                        X_{a1} & X_{a2} & \cdots & X_{ab}
+                        x_{a1} & x_{a2} & \cdots & x_{ab}
                     \end{bmatrix}
                     \]
                     
@@ -88,6 +88,18 @@
                         <li>El índice \(a\) corresponde directamente al índice de muestras de \(X\), asegurando una alineación perfecta entre cada entrada y su salida esperada.</li>
                         <li>El índice \(c\) recorre las <strong>clases</strong> o variables de salida. En el caso más simple de regresión, \(c\) podría ser 1, pero esta notación nos permite manejar modelos que predicen múltiples valores simultáneamente.</li>
                     </ul>
+
+                    Este tensor se veria (de manera general) asi:
+
+                    \[
+                    Y = \begin{bmatrix}
+                        y_{11} & y_{12} & \cdots & y_{1c} \\
+                        y_{21} & y_{22} & \cdots & y_{2c} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        y_{a1} & y_{a2} & \cdots & y_{ac}
+                    \end{bmatrix}
+                    \]
+                    
                     Un elemento \(Y_{ac}\) es, por tanto, el valor real de la \(c\)-ésima variable de salida para la \(a\)-ésima muestra.
                 </li>
             </ul>
@@ -103,13 +115,58 @@
                         <li>El índice \(b\) se alinea con las \(b\) características del tensor de entrada \(X\).</li>
                         <li>El índice \(c\) se alinea con las \(c\) clases del tensor de salida \(Y\).</li>
                     </ul>
+
+                    Este tensor se veria (de manera general) asi:
+
+                    \[
+                    W = \begin{bmatrix}
+                        w_{11} & w_{12} & \cdots & w_{1c} \\
+                        w_{21} & w_{22} & \cdots & w_{2c} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        w_{b1} & w_{b2} & \cdots & w_{bc}
+                    \end{bmatrix}
+                    \]
+                    
                     De este modo, un elemento escalar \(W_{bc}\) representa el peso que modula la influencia de la \(b\)-ésima característica de entrada sobre la \(c\)-ésima predicción de salida.
                 </li>
                 <br>
                 <li><strong>El Tensor de Sesgo \(B\):</strong>
                     El tensor de sesgo, también conocido como <em>bias</em> o intercepto, actúa como un término de desplazamiento. Permite que el hiperplano del modelo se ajuste verticalmente, sin necesidad de pasar por el origen del espacio de características. Lo definimos con dimensiones \(a \times c\):
                     \[ B \in \mathbb{R}^{a \times c} \]
-                    Es fundamental prestar atención a una restricción estructural clave, anotada en nuestro desarrollo manuscrito: <strong>cada columna del tensor \(B\) debe contener el mismo valor</strong>. Esto significa que, aunque lo representamos como una matriz de \(a \times c\) para facilitar las operaciones tensoriales, conceptualmente es un vector de sesgos de tamaño \(c\). El mismo valor de sesgo para una clase específica, digamos \(B_{c}\), se aplica de manera idéntica a todas las \(a\) muestras. Esta estructura es una forma de incorporar la operación de <em>broadcasting</em>, común en las librerías de cálculo numérico, dentro de nuestro formalismo.
+
+                    El tensor de sesgo se crea a partir de 2 tensores de orden 2:
+
+                    <ul>
+                        <li>
+                            Tensor "\(b\)", el cual tiene dimensiones \( 1 \times c\), donde los c-ésimos valores corresponden al sesgo que va a tener cada una de las "neuronas";
+                        </li>
+
+                        <li>
+                            Tensor "\( Ones \)", el cual tiene dimensiones \( a \times a \) y sus valores son simplemente unos.
+                        </li>
+                    <ul>
+                    
+                    <p>Con estos 2 "sub-tensores", podemos construir el tensor final \( B \), de manera que cada columna tenga los mismos valores (correspondiente a cada "neurona").</p>
+
+                    <p>Esta operación se realiza (en notación de Einstein) de la siguiente manera:</p>
+
+                    \[
+                    B_{ac} = \text{Ones}_{a \times 1} b_{1 \times c} = \sum \text{Ones}_{a \times 1} \cdot b_{1 \times c}
+                    \]
+
+                    <p>De forma más visual, la generalización sería así:</p>
+
+                    \[
+                    B_{ac} = \text{Ones}_{a \times 1} b_{1 \times c}
+                    =
+                    \begin{bmatrix}
+                        b_{11} & b_{12} & \cdots & b_{1c} \\
+                        b_{11} & b_{12} & \cdots & b_{1c} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        b_{11} & b_{12} & \cdots & b_{1c}
+                    \end{bmatrix}
+                    \]
+                    
                 </li>
             </ul>
             <p>Con nuestros cuatro tensores fundamentales —\(X\), \(Y\), \(W\) y \(B\)— ahora definidos, hemos sentado las bases para construir el modelo. El siguiente paso es ponerlos en acción en el <strong>Forward Pass</strong>, el proceso de combinar los datos de entrada con los parámetros para generar nuestra primera predicción.</p>
