@@ -142,19 +142,19 @@
                         </li>
 
                         <li>
-                            Tensor "\( Ones \)", el cual tiene dimensiones \( a \times a \) y sus valores son simplemente unos.
+                            Tensor "\( Ones \)", el cual tiene dimensiones \( a \times 1 \) y sus valores son simplemente unos.
                         </li>
                     <ul>
                     
-                    <p>Con estos 2 "sub-tensores", podemos construir el tensor final \( B \), de manera que cada columna tenga los mismos valores (correspondiente a cada "neurona").</p>
+                    Con estos 2 "sub-tensores", podemos construir el tensor final \( B \), de manera que cada columna tenga los mismos valores (correspondiente a cada "neurona").
 
-                    <p>Esta operación se realiza (en notación de Einstein) de la siguiente manera:</p>
+                    Esta operación se realiza (en notación de Einstein) de la siguiente manera:
 
                     \[
                     B_{ac} = \text{Ones}_{a \times 1} b_{1 \times c} = \sum \text{Ones}_{a \times 1} \cdot b_{1 \times c}
                     \]
 
-                    <p>De forma más visual, la generalización sería así:</p>
+                    De forma más visual, la generalización sería así:
 
                     \[
                     B_{ac} = \text{Ones}_{a \times 1} b_{1 \times c}
