@@ -67,4 +67,161 @@
             <p>Antes de sumergirnos en la mecánica de este ciclo, es imperativo establecer un lenguaje común. Nuestro primer paso será definir formalmente las estructuras de datos, o tensores, con las que operaremos, estableciendo las convenciones de notación que nos guiarán a través de este desarrollo matemático.</p>
 
             <hr>
+
+            <h2><strong>Formalización Matemática: Definiendo los Tensores del Modelo</strong></h2>
+            
+            <p>Para construir nuestro modelo de Regresión Lineal sobre una base rigurosa, debemos primero definir con precisión los objetos matemáticos que lo componen. En este contexto, trataremos todas nuestras estructuras de datos —entradas, salidas y parámetros— como <strong>tensores</strong>. Un tensor es una generalización de vectores y matrices a un número arbitrario de dimensiones, y nos proporciona un marco robusto para describir las operaciones de nuestro modelo.</p>
+            
+            <p>Para manipular estos tensores, emplearemos exclusivamente la <strong>notación de Einstein</strong>. Esta convención es a la vez elegante y poderosa: cualquier índice que aparezca repetido en un mismo término implica una suma sobre todos los valores posibles de dicho índice. Por ejemplo, un término como \(X_{ab}W_{bc}\) es una forma compacta de escribir \(\sum_{b} X_{ab}W_{bc}\). Esta notación nos permitirá expresar operaciones complejas, como la multiplicación de matrices, sin la ambigüedad de la notación matricial tradicional, enfocándonos en la interacción entre las dimensiones.</p>
+            
+            <h3><strong>Los Datos: Entrada y Salida</strong></h3>
+            
+            <p>Nuestros datos consisten en dos componentes principales: las observaciones de entrada y los valores objetivo correspondientes.</p>
+            
+            <ul>
+                <li><strong>El Tensor de Entrada \(X\):</strong> Este tensor contiene el conjunto completo de nuestras observaciones. Lo definimos como un tensor de rango 2 (una matriz) de dimensiones \(a \times b\):
+                    
+                    \[ X \in \mathbb{R}^{a \times b} \]
+                    
+                    Los índices tienen un significado preciso:
+                    
+                    <br>
+                    
+                    <ul>
+                        <li>El índice \(a\) recorre las <strong>muestras</strong> (<em>samples</em>) de nuestro conjunto de datos, desde \(1\) hasta el número total de observaciones.</li>
+
+                        <br>
+                        
+                        <li>El índice \(b\) recorre las <strong>características</strong> (<em>features</em>) que describen cada muestra.</li>
+                    </ul>
+
+                    <br>
+                    
+                    Este tensor se veria (de manera general) asi:
+
+                    \[
+                    X = \begin{bmatrix}
+                        x_{11} & x_{12} & \cdots & x_{1b} \\
+                        x_{21} & x_{22} & \cdots & x_{2b} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        x_{a1} & x_{a2} & \cdots & x_{ab}
+                    \end{bmatrix}
+                    \]
+                    
+                    Así, un elemento escalar \(X_{ab}\) representa el valor de la \(b\)-ésima característica para la \(a\)-ésima muestra de nuestros datos.
+                </li>
+                
+                <br>
+                
+                <li><strong>El Tensor Objetivo \(Y\):</strong> Este tensor alberga los valores verdaderos que nuestro modelo aspira a predecir. Al igual que \(X\), es un tensor de rango 2, pero con dimensiones \(a \times c\):
+                    
+                    \[ Y \in \mathbb{R}^{a \times c} \]
+                    
+                    El significado de sus índices es el siguiente:
+
+                    <br>
+                    
+                    <ul>
+                        <li>El índice \(a\) corresponde directamente al índice de muestras de \(X\), asegurando una alineación perfecta entre cada entrada y su salida esperada.</li>
+                        
+                        <br>
+
+                        <li>El índice \(c\) recorre las <strong>clases</strong> o variables de salida. En el caso más simple de regresión, \(c\) podría ser 1, pero esta notación nos permite manejar modelos que predicen múltiples valores simultáneamente.</li>
+                    </ul>
+
+                    <br>
+                    
+                    Este tensor se veria (de manera general) asi:
+
+                    \[
+                    Y = \begin{bmatrix}
+                        y_{11} & y_{12} & \cdots & y_{1c} \\
+                        y_{21} & y_{22} & \cdots & y_{2c} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        y_{a1} & y_{a2} & \cdots & y_{ac}
+                    \end{bmatrix}
+                    \]
+                    
+                    Un elemento \(Y_{ac}\) es, por tanto, el valor real de la \(c\)-ésima variable de salida para la \(a\)-ésima muestra.
+                </li>
+            </ul>
+            
+            <h3><strong>Los Parámetros del Modelo: Pesos y Sesgo</strong></h3>
+            
+            <p>Los parámetros del modelo son los valores numéricos que no se derivan de los datos, sino que son "aprendidos" durante el proceso de entrenamiento. Son las "perillas" que ajustaremos para minimizar el error de predicción.</p>
+            
+            <ul>
+                <li><strong>El Tensor de Pesos \(W\):</strong> El tensor de pesos \(W\) captura la fuerza y el signo de la relación entre cada característica de entrada y cada clase de salida. Se define como un tensor de rango 2 de dimensiones \(b \times c\):
+                    
+                    \[ W \in \mathbb{R}^{b \times c} \]
+                    
+                    La lógica de sus índices es crucial para la conexión entre entrada y salida:
+                    
+                    <br>
+                    
+                    <ul>
+                        <li>El índice \(b\) se alinea con las \(b\) características del tensor de entrada \(X\).</li>
+                        
+                        <br>
+                        
+                        <li>El índice \(c\) se alinea con las \(c\) clases del tensor de salida \(Y\).</li>
+                    </ul>
+
+                    Este tensor se veria (de manera general) asi:
+
+                    \[
+                    W = \begin{bmatrix}
+                        w_{11} & w_{12} & \cdots & w_{1c} \\
+                        w_{21} & w_{22} & \cdots & w_{2c} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        w_{b1} & w_{b2} & \cdots & w_{bc}
+                    \end{bmatrix}
+                    \]
+                    
+                    De este modo, un elemento escalar \(W_{bc}\) representa el peso que modula la influencia de la \(b\)-ésima característica de entrada sobre la \(c\)-ésima predicción de salida.
+                </li>
+                
+                <br>
+                
+                <li><strong>El Tensor de Sesgo \(B\):</strong> El tensor de sesgo, también conocido como <em>bias</em> o intercepto, actúa como un término de desplazamiento. Permite que el hiperplano del modelo se ajuste verticalmente, sin necesidad de pasar por el origen del espacio de características. Lo definimos con dimensiones \(a \times c\):
+                    
+                    \[ B \in \mathbb{R}^{a \times c} \]
+
+                    El tensor de sesgo se crea a partir de 2 tensores de orden 2:
+
+                    <br>
+                    
+                    <ul>
+                        <li>
+                            Tensor "\(b\)", el cual tiene dimensiones \( 1 \times c\), donde los c-ésimos valores corresponden al sesgo que va a tener cada una de las "neuronas";
+                        </li>
+
+                        <li>
+                            Tensor "\( Ones \)", el cual tiene dimensiones \( a \times 1 \) y sus valores son simplemente unos.
+                        </li>
+                    <ul>
+                    
+                    Con estos 2 "sub-tensores", podemos construir el tensor final \( B \), de manera que cada columna tenga los mismos valores (correspondiente a cada "neurona").
+
+                    Esta operación se realiza (en notación de Einstein) de la siguiente manera:
+
+                    \[
+                    B_{ac} = \text{Ones}_{a \times 1} b_{1 \times c} = \sum \text{Ones}_{a \times 1} \cdot b_{1 \times c}
+                    \]
+
+                    De forma más visual, la generalización sería así:
+
+                    \[
+                    B_{ac} = \text{Ones}_{a \times 1} b_{1 \times c}
+                    =
+                    \begin{bmatrix}
+                        b_{11} & b_{12} & \cdots & b_{1c} \\
+                        b_{11} & b_{12} & \cdots & b_{1c} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        b_{11} & b_{12} & \cdots & b_{1c}
+                    \end{bmatrix}
+                    \]
+                    
+                </li>
+            </ul>
           
