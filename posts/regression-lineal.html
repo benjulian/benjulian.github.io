@@ -53,11 +53,11 @@
             <ol>
                 
                 <li><strong>Forward Pass (Paso hacia adelante):</strong> Utilizando una estimación inicial de \(W\) y \(B\), aplicamos la ecuación del modelo a nuestros datos de entrada \(X\) para generar un conjunto de predicciones \(Z\).</li>
-                
+                <br>
                 <li><strong>Loss Computation (Cálculo de la Périda):</strong> Medimos qué tan erróneas son nuestras predicciones comparando \(Z\) con los valores verdaderos \(Y\). Esta medida de error se cuantifica en un único valor escalar llamado "périda" (<em>loss</em>).</li>
-                
+                <br>
                 <li><strong>Backward Pass (Paso hacia atrás):</strong> Aquí es donde interviene el cálculo. Determinamos cómo un pequeño cambio en cada uno de los parámetros de \(W\) y \(B\) afectaría la pérdida total. Este proceso nos da los gradientes, que nos indican la dirección en la que debemos ajustar nuestros parámetros para reducir el error.</li>
-                
+                <br>
                 <li><strong>Optimization (Optimización):</strong> Finalmente, actualizamos los valores de \(W\) y \(B\) moviéndolos ligeramente en la dirección opuesta a sus gradientes, acercándonos un paso más a la configuración óptima que minimiza el error.</li>
             
             </ol>
