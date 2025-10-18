@@ -313,7 +313,7 @@
             
             <p>El objetivo es calcular las derivadas parciales de la pérdida con respecto a cada elemento de nuestros tensores de parámetros. Estas derivadas, conocidas como gradientes, nos indicarán la dirección de máximo ascenso de la función de pérdida. Para minimizarla, simplemente daremos un pequeño paso en la dirección opuesta.</p>
             
-            <p>Para mantener la consistencia dimensional, adoptaremos la <strong>convención de diseño del numerador</strong> (<em>numerator layout</em>). Esto significa que el resultado de una derivada tendrá dimensiones del numerador x denominador. Por ejemplo, el tensor de gradientes \(\frac{\partial Z}{\partial W}\) será un tensor de dimensiones \(a \times c \times b \times c \) (\( a \times c \text{son las dimensiones del tensor del numerador, y} b \times c \text{son las dimensiones del tensor del denominador} \).</p>
+            <p>Para mantener la consistencia dimensional, adoptaremos la <strong>convención de diseño del numerador</strong> (<em>numerator layout</em>). Esto significa que el resultado de una derivada tendrá dimensiones del numerador x denominador. Por ejemplo, el tensor de gradientes \(\frac{\partial Z}{\partial W}\) será un tensor de dimensiones \(a \times c \times b \times c \) ( \( a \times c \) son las dimensiones del tensor del numerador, y \( b \times c \) son las dimensiones del tensor del denominador).</p>
             
             <h3><strong>La Estrategia y una Aclaración Notacional Crucial</strong></h3>
             
