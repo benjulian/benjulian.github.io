@@ -244,17 +244,17 @@
             <p>La operación que define este proceso es la transformación lineal que postulamos en nuestra hipótesis inicial. Su formalización matemática, extraída directamente de nuestro desarrollo, es la siguiente:</p>
             
             \[
-            Z_{ac} = X_{ab}W_{bc} + B_{ac}
+            Z_{ac} = X_{ab} ; W_{bc} + B_{ac}
             \]
             
             <p>Esta ecuación define el tensor de salida de nuestro modelo, \(Z\), el cual, por construcción, tendrá las mismas dimensiones que nuestro tensor objetivo \(Y\), es decir, \(Z \in \mathbb{R}^{a \times c}\). Analicemos cada componente de esta operación fundamental.</p>
             
             <h3><strong>La Suma Ponderada de Características</strong></h3>
             
-            <p>El núcleo de la ecuación reside en el término \(X_{ab}W_{bc}\). Siguiendo la convención de notación de Einstein, observamos que el índice \(b\) se repite. Esto nos indica que debemos realizar una suma sobre todas las dimensiones de las características. De forma explícita, la operación es:</p>
+            <p>El núcleo de la ecuación reside en el término \(X_{ab} ; W_{bc}\). Siguiendo la convención de notación de Einstein, observamos que el índice \(b\) se repite. Esto nos indica que debemos realizar una suma sobre todas las dimensiones de las características. De forma explícita, la operación es:</p>
             
             \[ 
-            \sum_{b=1}^{b} X_{ab}W_{bc}
+            \sum_{b=1}^{b} X_{ab} ; W_{bc}
             \]
             
             <p>Conceptualmente, esta operación calcula una <strong>suma ponderada</strong>. Para una muestra específica \(a\) y una clase de salida \(c\), el modelo recorre cada una de las \(b\) características de esa muestra. El valor de cada característica, \(X_{ab}\), se multiplica por su peso correspondiente, \(W_{bc}\), que lo conecta con la clase de salida \(c\). El resultado de la suma es la contribución agregada de todas las características a la predicción final para esa muestra y esa clase. Los índices que no se suman, \(a\) y \(c\), se conocen como índices "libres" y determinan la forma del tensor resultante de esta multiplicación.</p>
@@ -270,4 +270,40 @@
             <p>Hemos completado con éxito el primer paso: hemos transformado nuestra entrada en una salida. Sin embargo, esta predicción se ha generado utilizando parámetros \(W\) y \(B\) que, al inicio, son probablemente aleatorios y, por tanto, incorrectos. El siguiente paso lógico e indispensable es cuantificar exactamente <em>cuán</em> incorrectas son estas predicciones. Para ello, debemos introducir una <strong>función de pérdida</strong>.</p>
             
             <hr>
-          
+
+        <h2><strong>Cálculo de la Pérdida: Cuantificando el Error del Modelo</strong></h2>
+            
+            <p>El Forward Pass nos ha proporcionado un tensor de predicciones lineales, \(Z\). Sin embargo, por sí solo, este tensor no nos dice nada sobre el rendimiento de nuestro modelo. Para avanzar en el ciclo de entrenamiento, necesitamos un método riguroso para cuantificar la discrepancia total entre nuestras predicciones \(Z\) y los valores verdaderos \(Y\). El objetivo es destilar toda la información de error, que existe para cada punto de datos y cada clase de salida, en un <strong>único valor escalar</strong>. Este escalar, al que llamamos <strong>Pérdida</strong> (<em>Loss</em>), servirá como una medida global y objetiva del rendimiento del modelo en su estado actual.</p>
+            
+            <p>Para esta tarea, nuestro desarrollo matemático emplea una de las funciones de pérdida más fundamentales y extendidas en problemas de regresión: el <strong>Error Cuadrático Medio</strong> (<em>Mean Squared Error</em> o MSE). Se define de la siguiente manera:</p>
+            
+            \[ 
+            \text{Loss} := \text{MSE} = \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} (Z_{ac} - Y_{ac})^2
+            \]
+            
+            <p>Para comprender verdaderamente lo que esta ecuación representa, deconstruyámosla desde su núcleo hacia el exterior.</p>
+            
+            <ol>
+                <li><strong>El Error Individual: \((Z_{ac} - Y_{ac})\)</strong><br>Todo comienza aquí, con la operación más simple: la diferencia entre el valor predicho \(Z_{ac}\) y el valor real \(Y_{ac}\) para una única muestra \(a\) y una única clase de salida \(c\). Este resultado, conocido como residuo, nos dice la magnitud y dirección del error para un único punto de predicción.</li>
+                
+                <br>
+                
+                <li><strong>El Error al Cuadrado: \((\dots)^2\)</strong><br>A continuación, elevamos esta diferencia al cuadrado. Este paso es crucial por dos razones. Primero, <strong>garantiza la positividad</strong>: al elevar al cuadrado, todos los errores (tanto si la predicción fue demasiado alta como demasiado baja) se convierten en valores positivos. Esto evita que errores de signo opuesto se anulen entre sí al sumarlos. Segundo, <strong>penaliza desproporcionadamente los errores grandes</strong>: un error de magnitud 2 contribuye con 4 a la pérdida total, mientras que un error de 10 contribuye con 100. Este comportamiento empuja al algoritmo de optimización a priorizar la corrección de las desviaciones más graves.</li>
+                
+                <br>
+                
+                <li><strong>La Suma Total: \(\sum_{a=1}^{a} \sum_{c=1}^{c}\)</strong><br>La doble sumatoria agrega todos estos errores cuadráticos individuales. <br><br> Mientras que la suma sobre las muestras \(a\) es intuitiva —simplemente estamos acumulando el error de cada una de las observaciones en nuestro conjunto de datos—, la suma sobre las clases \(c\) merece una atención especial.<br><br>Nuestro formalismo es general, diseñado para manejar modelos que pueden predecir múltiples valores simultáneamente (lo que se conoce como regresión multivariable). Imaginemos un caso en el que, para una entrada, predecimos tanto una altura como un ancho. Para esa única muestra, tendríamos un error en la predicción de la altura y otro en la del ancho. La función de pérdida debe consolidar estos errores en un único número que represente el rendimiento para esa muestra. La suma interna sobre \(c\) logra precisamente esto: <strong>agrega los errores cuadráticos de todas las dimensiones de salida para una muestra dada</strong>, dándonos el error total para esa única observación. Posteriormente, la suma externa sobre \(a\) acumula estos errores por muestra para obtener el error cuadrático total de todo el conjunto de datos.</li>
+                
+                <br>
+                
+                <li><strong>El Promedio: \(\frac{1}{n}\)</strong><br>Finalmente, dividimos la suma total por \(n\). Este término es una constante de normalización, donde \(n\) suele ser el número de muestras (\(a\)) o el número total de elementos (\(a \times c\)). Su propósito es hacer que el valor de la pérdida sea independiente del tamaño del lote de datos que estemos utilizando. Esto nos permite comparar de manera justa el rendimiento del modelo entre diferentes iteraciones o con diferentes conjuntos de datos.</li>
+            </ol>
+            
+            <h3><strong>El Objetivo Final: Minimizar la Pérdida</strong></h3>
+            
+            <p>Es vital entender que el valor escalar del MSE no es simplemente una métrica de reporte. Es el <strong>objetivo central de nuestra optimización</strong>. Todo el proceso de entrenamiento se puede resumir en una sola meta: encontrar la combinación de parámetros en los tensores \(W\) y \(B\) que haga que el valor de esta función de pérdida sea lo más pequeño posible.</p>
+            
+            <p>Esto nos lleva a la pregunta que impulsa el resto de nuestro análisis: si tenemos un valor de pérdida, ¿cómo sabemos en qué dirección debemos ajustar los miles o millones de parámetros en \(W\) y \(B\) para reducirla? La respuesta no está en la intuición, sino en el cálculo diferencial. Necesitamos determinar la influencia de cada parámetro individual en el error total. Este es el propósito del <strong>Backward Pass</strong>.</p>
+        
+            <hr>
+
