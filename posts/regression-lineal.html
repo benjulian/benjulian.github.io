@@ -201,7 +201,7 @@
                         <br>
                         
                         <li>
-                            Tensor "\( Ones \)", el cual tiene dimensiones \( a \times 1 \) y sus valores son simplemente unos.
+                            Tensor "\( 1 \)", el cual tiene dimensiones \( a \times 1 \) y sus valores son simplemente unos.
                         </li>
                     </ul>
                     
@@ -210,13 +210,13 @@
                     Esta operación se realiza (en notación de Einstein) de la siguiente manera:
 
                     \[
-                    B_{ac} = \text{Ones}_{a \times 1} b_{1 \times c} = \sum \text{Ones}_{a \times 1} \cdot b_{1 \times c}
+                    B_{ac} = 1_{a \times 1} b_{1 \times c} = \sum 1_{a \times 1} \cdot b_{1 \times c}
                     \]
 
                     De forma más visual, la generalización sería así:
 
                     \[
-                    B_{ac} = \text{Ones}_{a \times 1} b_{1 \times c}
+                    B_{ac} = 1_{a \times 1} b_{1 \times c}
                     =
                     \begin{bmatrix}
                         b_{11} & b_{12} & \cdots & b_{1c} \\
@@ -229,7 +229,7 @@
                     De esta forma, la ecuacion de la regresion lineal seria asi:
 
                     \[
-                    Z_{ac} = X_{ab} \; W_{bc} + \text{Ones}_{a \times 1} b_{1 \times c} = \left\{ \sum_{b=1}^{b} X_{ab} \times W_{bc} \right\} + \text{Ones}_{a \times 1} \; b_{1 \times c}
+                    Z_{ac} = X_{ab} \; W_{bc} + 1_{a \times 1} b_{1 \times c} = \left\{ \sum_{b=1}^{b} X_{ab} \times W_{bc} \right\} + 1_{a \times 1} \; b_{1 \times c}
                     \]
                     
                 </li>
