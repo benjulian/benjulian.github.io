@@ -487,4 +487,58 @@
             
         <h2><strong>De la Teoría a la Práctica: Simplificación del Backward Pass</strong></h2>
 
-        
+            <p>En la sección anterior, derivamos con éxito las expresiones para los gradientes de la pérdida con respecto a cada uno de nuestros parámetros. Sin embargo, nos encontramos con un dilema computacional. La aplicación directa de la regla de la cadena, tal como la formulamos, implica la creación conceptual de tensores de 4º orden (por ejemplo, \(\frac{\partial Z_{ac}}{\partial W_{b'c'}}\)). Estos objetos matemáticos, aunque teóricamente correctos, serían desastrosos en la práctica. Serían "súper dispersos", es decir, estarían llenos casi en su totalidad de ceros, ocupando una cantidad masiva de memoria para almacenar muy poca información útil.</p>
+            
+            <p>Afortunadamente, no necesitamos construir estos tensores. La belleza de la notación de Einstein y las propiedades del Delta de Kronecker nos permiten simplificar algebraicamente estas complejas expresiones, reduciéndolas a operaciones de tensores de rango 2 (matrices) que son la base del cálculo numérico eficiente.</p>
+                
+                <h3><strong>Simplificación del Gradiente de los Pesos (\(\frac{\partial \text{MSE}}{\partial W}\))</strong></h3>
+            
+                    <p>Comencemos con la expresión completa de la regla de la cadena para un único elemento del gradiente de los pesos, \(\frac{\partial \text{MSE}}{\partial W_{b'c'}}\):</p>
+                    
+                    \[ 
+                    \frac{\partial \text{MSE}}{\partial W_{b'c'}} = \sum_{a=1}^{a} \sum_{c=1}^{c} \frac{\partial \text{MSE}}{\partial Z_{ac}} \frac{\partial Z_{ac}}{\partial W_{b'c'}}
+                    \]
+                    
+                    <p>Ahora, sustituimos la expresión que ya encontramos para \(\frac{\partial Z_{ac}}{\partial W_{b'c'}}\), que es \(X_{ab'} \delta_{cc'}\):</p>
+                    
+                    \[ 
+                    \frac{\partial \text{MSE}}{\partial W_{b'c'}} = \sum_{a=1}^{a} \sum_{c=1}^{c} \frac{\partial \text{MSE}}{\partial Z_{ac}} (X_{ab'} \delta_{cc'}) 
+                    \]
+                    
+                    <p>Aquí es donde ocurre la primera simplificación. Como se anota en nuestro desarrollo manuscrito, el Delta de Kronecker \(\delta_{cc'}\) actúa como un filtro sobre la suma interna en \(c\). Anula todos los términos de la suma excepto el único en el que \(c = c'\). Esto nos permite <strong>colapsar la suma sobre \(c\)</strong> y, en el proceso, <strong>sustituir el índice \(c\) por \(c'\)</strong> en el resto de la expresión:</p>
+                    
+                    \[ 
+                    \frac{\partial \text{MSE}}{\partial W_{b'c'}} = \sum_{a=1}^{a} \frac{\partial \text{MSE}}{\partial Z_{ac'}} X_{ab'} 
+                    \]
+            
+                    <p>Analicemos esta expresión resultante. Para calcular un único elemento del gradiente, indexado por \((b', c')\), estamos realizando una suma sobre el índice de las muestras, \(a\). Los dos términos dentro de la suma, \(\frac{\partial \text{MSE}}{\partial Z_{ac'}}\) y \(X_{ab'}\), son elementos de dos tensores de rango 2 (matrices). Una suma sobre un índice repetido entre dos tensores de esta manera es, por definición, la operación que construye un elemento de una multiplicación de matrices.</p>
+                    
+                    <p>Si esta suma calcula un solo elemento, entonces la operación para calcular el tensor de gradiente completo, \(\frac{\partial \text{MSE}}{\partial W}\), debe ser una multiplicación de matrices. Sin embargo, debemos ser cuidadosos con las dimensiones. Tenemos el tensor \(X\) con dimensiones \((a \times b)\) y el tensor \(\frac{\partial \text{MSE}}{\partial Z}\) con dimensiones \((a \times c)\). Para producir un tensor de gradiente con las dimensiones correctas de \(W\), que son \((b \times c)\), la operación matricial correcta es multiplicar la transpuesta de \(X\) por el gradiente intermedio:</p>
+                    
+                    \[ 
+                    \frac{\partial \text{MSE}}{\partial W} = (X)^T \left( \frac{\partial \text{MSE}}{\partial Z} \right) 
+                    \]
+                    
+                    <p>Verificamos las dimensiones: \((b \times a) \cdot (a \times c) \rightarrow (b \times c)\). La operación es dimensionalmente consistente y computacionalmente eficiente.</p>
+                
+                <h3><strong>Simplificación del Gradiente del Sesgo (\(\frac{\partial \text{MSE}}{\partial B}\))</strong></h3>
+            
+                    <p>Sigamos un proceso similar para el gradiente del sesgo. Partimos de la expresión de la regla de la cadena para un elemento \(\frac{\partial \text{MSE}}{\partial B_{a'c'}}\):</p>
+                    
+                    \[ 
+                    \frac{\partial \text{MSE}}{\partial B_{a'c'}} =  
+                    \]
+                    
+                    <p>Sustituimos la expresión que encontramos para \(\frac{\partial Z_{ac}}{\partial B_{a'c'}}\), que es el producto de dos Deltas de Kronecker, \(\delta_{aa'} \delta_{cc'}\):</p>
+                    
+                    \[ 
+                    \frac{\partial \text{MSE}}{\partial B_{a'c'}} = \sum_{a=1}^{a} \sum_{c=1}^{c} \frac{\partial \text{MSE}}{\partial Z_{ac}} (\delta_{aa'} \delta_{cc'}) 
+                    \]
+                    
+                    <p>Aquí, la simplificación es aún más dramática. El delta \(\delta_{cc'}\) colapsa la suma sobre \(c\), reemplazando \(c\) por \(c'\). Inmediatamente después, el delta \(\delta_{aa'}\) colapsa la suma restante sobre \(a\), reemplazando \(a\) por \(a'\). Ambas sumas desaparecen, dejándonos con un resultado sorprendentemente simple:</p>
+                    
+                    \[ 
+                    \frac{\partial \text{MSE}}{\partial B_{a'c'}} = \frac{\partial \text{MSE}}{\partial Z_{a'c'}} 
+                    \]
+                    
+                    <p>En su forma tensorial, esto implica que el gradiente de la pérdida con respecto al sesgo es simplemente el gradiente intermedio que ya habíamos calculado. En implementaciones prácticas, a menudo se realiza un paso adicional de sumar o promediar este gradiente a lo largo del eje de las muestras (\(a\)) para obtener un único vector de gradiente de tamaño \(c\), que corresponde a la naturaleza conceptual de nuestro sesgo.</p>     
