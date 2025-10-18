@@ -540,5 +540,23 @@
                     \[ 
                     \frac{\partial \text{MSE}}{\partial B_{a'c'}} = \frac{\partial \text{MSE}}{\partial Z_{a'c'}} 
                     \]
-                    
+                   
                     <p>En su forma tensorial, esto implica que el gradiente de la pérdida con respecto al sesgo es simplemente el gradiente intermedio que ya habíamos calculado. En implementaciones prácticas, a menudo se realiza un paso adicional de sumar o promediar este gradiente a lo largo del eje de las muestras (\(a\)) para obtener un único vector de gradiente de tamaño \(c\), que corresponde a la naturaleza conceptual de nuestro sesgo.</p>     
+
+        </article>
+        
+        <nav class="post-nav">
+            <a href="../index.html" class="back-link">&larr; Volver al inicio</a>
+        </nav>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 - Benjamin Julian</p>
+    </footer>
+
+    <!-- Script de Prism.js (debe ir al final del body) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+</body>
+</html>
