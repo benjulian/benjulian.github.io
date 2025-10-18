@@ -331,4 +331,55 @@
 
             <p>De todas formas, en ultima instancia, los indices con apoostrofe (') tienen los mismos valores que sus "gemelos".</p>
 
+            <h3><strong>Paso 1: El Gradiente Intermedio \(\frac{\partial \text{MSE}}{\partial Z_{ac}}\)</strong></h3>
+            
+            <p>Viendo el camino de influencias, el primer paso, común a ambos gradientes de parámetros, es calcular cómo cambia la pérdida con respecto a un cambio en una predicción \(Z_{ac}\). Para construir el tensor de gradientes \(\frac{\partial \text{MSE}}{\partial Z}\), calculamos la derivada para un elemento genérico \(\frac{\partial \text{MSE}}{\partial Z_{a'c'}}\).</p>
+            
+            <p>Partimos de la definición del MSE:</p>
+            
+            \[ 
+            \text{MSE} = \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} (Z_{ac} - Y_{ac})^2 
+            \]
+            
+            <p>Aplicamos la derivada \( \frac{\partial}{\partial Z_{a'c'}} \) a toda la expresión:</p> 
+
+            \[
+            \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{\partial}{\partial Z_{a'c'}} \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} (Z_{ac} - Y_{ac})^2
+            \]
+            
+            <p>El escalar \( \frac{1}{n} \) esta multiplicando, por lo que lo podemos sacar fuera de la derivada:</p>
+            
+            \[
+            \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \frac{\partial}{\partial Z_{a'c'}} \sum_{a=1}^{a} \sum_{c=1}^{c} (Z_{ac} - Y_{ac})^2
+            \]
+            
+            <p>La derivada puede pasar a través de la suma:</p>
+            
+            \[ 
+            \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} \frac{\partial}{\partial Z_{a'c'}} (Z_{ac} - Y_{ac})^2
+            \]
+            
+            <p>Usando la regla de la cadena, la derivada del término al cuadrado es:</p>
+            
+            \[ 
+            \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} 2(Z_{ac} - Y_{ac}) \cdot \frac{\partial (Z_{ac} - Y_{ac})}{\partial Z_{a'c'}} 
+            \]
+            
+            <p>En la derivada interna, el elemento \( Y_{ac} \) es una variable constante con respecto a \( Z_{a'c'} \), por lo que su valor es simplemente 0. Ahora, la derivada de lo que queda del término interno, \(\frac{\partial Z_{ac}}{\partial Z_{a'c'}}\), es 1 si y solo si los índices coinciden ( \(a=a' \) y \( c=c' \)), y 0 en caso contrario. Esta es precisamente la definición del producto de dos <strong>Deltas de Kronecker</strong>: \( \delta_{aa'} \delta_{cc'} \).</p>
+            
+            \[ 
+            \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} 2(Z_{ac} - Y_{ac}) \cdot \delta_{aa'} \delta_{cc'} 
+            \]
+            
+            <p>El Delta de Kronecker tiene una propiedad fundamental: cuando multiplica a una expresión dentro de una suma, <strong>colapsa la suma</strong>. La presencia de \( \delta_{aa'} \) hace que todos los términos de la suma sobre \( a \) se anulen, excepto el único término donde \( a=a' \). Lo mismo ocurre con \(\ delta_{cc'} \) y la suma sobre \( c \). Como resultado, las sumas desaparecen y los índices mudos \( a \) y \( c \) son <strong>sustituidos</strong> por los índices fijos \( a' \) y \( c' \):</p>
+            
+            \[ 
+            \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \cdot 2(Z_{a'c'} - Y_{a'c'}) 
+            \]
+            
+            <p>Al generalizar esto de un elemento específico a la forma tensorial completa (reemplazando \(a', c'\) por \(a, c\)), obtenemos nuestro gradiente intermedio:</p>
+            
+            \[ 
+            \frac{\partial \text{MSE}}{\partial Z} = \frac{2(Z - Y)}{n} 
+            \]
             
