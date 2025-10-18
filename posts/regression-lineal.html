@@ -305,5 +305,30 @@
             
             <p>Esto nos lleva a la pregunta que impulsa el resto de nuestro análisis: si tenemos un valor de pérdida, ¿cómo sabemos en qué dirección debemos ajustar los miles o millones de parámetros en \(W\) y \(B\) para reducirla? La respuesta no está en la intuición, sino en el cálculo diferencial. Necesitamos determinar la influencia de cada parámetro individual en el error total. Este es el propósito del <strong>Backward Pass</strong>.</p>
         
-            <hr>
+        <hr>
 
+        <h2><strong>El Backward Pass: Rastreando la Influencia de Cada Parámetro</strong></h2>
+            
+            <p>Hemos cuantificado el error de nuestro modelo en un único escalar: la pérdida (MSE). Ahora nos enfrentamos a la pregunta central del aprendizaje: ¿cómo ajustamos los millones de parámetros en \(W\) y \(B\) para minimizar esta pérdida? La respuesta reside en el <strong>Backward Pass</strong>, un proceso elegante que utiliza el cálculo diferencial para determinar la contribución de cada parámetro individual al error total.</p>
+            
+            <p>El objetivo es calcular las derivadas parciales de la pérdida con respecto a cada elemento de nuestros tensores de parámetros. Estas derivadas, conocidas como gradientes, nos indicarán la dirección de máximo ascenso de la función de pérdida. Para minimizarla, simplemente daremos un pequeño paso en la dirección opuesta.</p>
+            
+            <p>Para mantener la consistencia dimensional, adoptaremos la <strong>convención de diseño del numerador</strong> (<em>numerator layout</em>). Esto significa que el resultado de una derivada tendrá dimensiones del numerador x denominador. Por ejemplo, el tensor de gradientes \(\frac{\partial Z}{\partial W}\) será un tensor de dimensiones \(a \times c \times b \times c \) (\( a \times c \text{son las dimensiones del tensor del numerador, y} b \times c \text{son las dimensiones del tensor del denominador} \).</p>
+            
+            <h3><strong>La Estrategia y una Aclaración Notacional Crucial</strong></h3>
+            
+            <p>Observando el diagrama de "Paths of Influence", vemos que los parámetros \(W\) y \(B\) no afectan la pérdida directamente. Su influencia es indirecta, mediada por el tensor de predicciones \(Z\). Esta estructura de dependencias nos obliga a usar la <strong>regla de la cadena</strong> del cálculo multivariable.</p>
+            
+            <p>Antes de aplicar la regla, debemos hacer una aclaración notacional fundamental. Al calcular la derivada de una función que contiene sumas (como el MSE o \(Z_{ac}\)) con respecto a un elemento específico de un tensor (por ejemplo, un peso particular), debemos distinguir entre los índices de la suma y los índices del elemento por el cual derivamos.</p>
+            
+            <ul>
+                <li>Los índices dentro de una suma (\(a, b, c\)) son variables "mudas" o locales a esa suma.</li>
+                
+                <li>Los índices del elemento por el cual derivamos son "fijos" y definen una coordenada específica en el tensor de gradientes.</li>
+            </ul>
+            
+            <p>Para evitar ambigüedad, usaremos un apóstrofe (') para los índices fijos. Así, calcularemos \(\frac{\partial \text{MSE}}{\partial W_{b'c'}}\) para encontrar el elemento en la fila \(b'\) y la columna \(c'\) del gradiente de los pesos.</p>
+
+            <p>De todas formas, en ultima instancia, los indices con apoostrofe (') tienen los mismos valores que sus "gemelos".</p>
+
+            
