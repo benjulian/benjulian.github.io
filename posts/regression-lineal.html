@@ -383,3 +383,83 @@
             \frac{\partial \text{MSE}}{\partial Z} = \frac{2(Z - Y)}{n} 
             \]
             
+
+            <h3><strong>Paso 2: El Gradiente de los Pesos \(\frac{\partial \text{MSE}}{\partial W}\)</strong></h3>
+            
+            <p>Ahora aplicamos la regla de la cadena para encontrar el gradiente con respecto a un peso genérico \(W_{b'c'}\). La influencia de \(W_{b'c'}\) se propaga a través de todos los elementos de \(Z\), por lo que debemos sumar todas estas contribuciones:</p>
+            
+            \[ 
+            \frac{\partial \text{MSE}}{\partial W_{b'c'}} = \sum_{a,c} \frac{\partial \text{MSE}}{\partial Z_{ac}} \frac{\partial Z_{ac}}{\partial W_{b'c'}} 
+            \]
+            
+            <p>Ya conocemos el primer término. Nos enfocamos en el segundo: \(\frac{\partial Z_{ac}}{\partial W_{b'c'}}\). Partimos de la definición de \(Z_{ac}\):</p>
+            
+            \[ 
+            \frac{\partial Z_{ac}}{\partial W_{b'c'}} = \frac{\partial}{\partial W_{b'c'}} \left( \sum_{b} X_{ab}W_{bc} + B_{ac} \right) 
+            \]
+            
+            <p>El término \(B_{ac}\) es constante con respecto a \(W\), por lo que su derivada es 0. Dentro de la suma, \(X_{ab}\) es un multiplicador constante. La derivada de \(W_{bc}\) con respecto a \(W_{b'c'}\) es, nuevamente, un Delta de Kronecker: \(\delta_{bb'} \delta_{cc'}\).</p>
+            
+            \[ 
+            \frac{\partial Z_{ac}}{\partial W_{b'c'}} = \sum_{b} X_{ab} (\delta_{bb'} \delta_{cc'}) 
+            \]
+            
+            <p>El delta \(\delta_{bb'}\) colapsa la suma sobre \(b\), sustituyendo el índice \(b\) por \(b'\). El delta \(\delta_{cc'}\) simplemente permanece.</p>
+            
+            \[ 
+            \frac{\partial Z_{ac}}{\partial W_{b'c'}} = X_{ab'} \delta_{cc'} 
+            \]
+
+            
+            <h3><strong>Paso 3: El Gradiente del Sesgo \(\frac{\partial \text{MSE}}{\partial B}\)</strong></h3>
+            
+            <p>El proceso para el sesgo es análogo. Aplicamos la regla de la cadena:</p>
+            
+            \[ 
+            \frac{\partial \text{MSE}}{\partial B_{a'c'}} = \sum_{a,c} \frac{\partial \text{MSE}}{\partial Z_{ac}} \frac{\partial Z_{ac}}{\partial B_{a'c'}} 
+            \]
+            
+            <p>Calculamos la derivada de \(Z_{ac}\) con respecto a un elemento genérico del sesgo, \(B_{a'c'}\):</p>
+            
+            \[ 
+            \frac{\partial Z_{ac}}{\partial B_{a'c'}} = \frac{\partial}{\partial B_{a'c'}} \left( \sum_{b} X_{ab}W_{bc} + B_{ac} \right) 
+            \]
+            
+            <p>Aquí, el término de la suma es constante y su derivada es 0. La derivada de \(B_{ac}\) con respecto a \(B_{a'c'}\) es simplemente \(\delta_{aa'} \delta_{cc'}\).</p>
+            
+            \[ 
+            \frac{\partial Z_{ac}}{\partial B_{a'c'}} = \delta_{aa'} \delta_{cc'} 
+            \]
+            
+            <p>Hemos derivado con éxito las expresiones para los componentes de nuestros gradientes. Sin embargo, si observamos las fórmulas completas de la regla de la cadena, vemos que implican sumas sobre múltiples índices y la manipulación de tensores de 4º orden (por ejemplo, \(\frac{\partial Z_{ac}}{\partial W_{b'c'}}\) es un tensor con cuatro índices). Implementar esto directamente sería extremadamente ineficiente.</p>
+            
+            <p>Afortunadamente, la estructura de estas ecuaciones y las propiedades del Delta de Kronecker nos permiten simplificar drásticamente estas operaciones, reduciéndolas a multiplicaciones de matrices eficientes, como veremos a continuación.</p>
+
+        <hr>
+
+        <h2><strong>Optimización: Cerrando el Ciclo con Descenso de Gradiente</strong></h2>
+        
+            <p>Hemos llegado al último eslabón de nuestra cadena lógica. A través del Forward Pass, generamos predicciones; con la función de pérdida, cuantificamos su error; y mediante el Backward Pass, calculamos los gradientes, \(\frac{\partial \text{MSE}}{\partial W}\) y \(\frac{\partial \text{MSE}}{\partial B}\). Ahora nos encontramos en posesión de la información más valiosa para el aprendizaje: sabemos exactamente cómo un pequeño cambio en cada peso y sesgo afectará al error total. La pregunta final es: ¿qué hacemos con esta información?</p>
+            <p>La respuesta se encuentra en el proceso de <strong>optimización</strong>. Los gradientes que hemos calculado tienen una interpretación geométrica fundamental: son tensores que, para cada parámetro, apuntan en la dirección de <strong>máximo ascenso</strong> en la "superficie de la pérdida". En otras palabras, nos indican la forma más rápida de <em>aumentar</em> el error. Nuestro objetivo, por supuesto, es el opuesto.</p>
+
+            <h4><strong>La Intuición del Descenso</strong></h4>
+            <p>Si el gradiente representa la "cuesta arriba" más pronunciada, entonces su negativo, <strong>el negativo del gradiente</strong>, debe representar la "cuesta abajo" más pronunciada. Esta es la idea central del algoritmo de optimización más fundamental: el <strong>Descenso de Gradiente</strong> (<em>Gradient Descent</em>). Para reducir nuestra pérdida, daremos un pequeño paso en la dirección opuesta a la del gradiente.</p>
+            <p>Sin embargo, no podemos simplemente restar el gradiente completo de nuestros parámetros. Hacerlo sería dar un paso de un tamaño arbitrario, lo que podría llevarnos a "saltar" por encima del punto mínimo de la superficie de pérdida y terminar en un lugar con un error aún mayor. Necesitamos controlar el tamaño de nuestro paso.</p>
+
+            <h4><strong>Formalización de la Regla de Actualización</strong></h4>
+            <p>Para modular la magnitud de nuestra actualización, introducimos un hiperparámetro clave: la <strong>tasa de aprendizaje</strong> (<em>learning rate</em>), denotada por el escalar \(\alpha\). Este es un número pequeño y positivo (por ejemplo, 0.01) que actúa como un factor de escala para el gradiente. Controla cuán agresivamente ajustamos nuestros parámetros en cada iteración del entrenamiento.</p>
+            <p>Con este último componente, podemos formular las reglas de actualización que definen el algoritmo de Descenso de Gradiente:</p>
+            \[ W_{\text{nuevo}} = W_{\text{viejo}} - \alpha \frac{\partial \text{MSE}}{\partial W} \]
+            \[ B_{\text{nuevo}} = B_{\text{viejo}} - \alpha \frac{\partial \text{MSE}}{\partial B} \]
+            <p>Cada parte de esta ecuación tiene un propósito claro: actualizamos el valor de un parámetro (\(W_{\text{viejo}}\)) moviéndolo en la dirección del gradiente negativo (\(-\frac{\partial \text{MSE}}{\partial W}\)), con un tamaño de paso controlado por la tasa de aprendizaje (\(\alpha\)).</p>
+            
+            <h4><strong>El Ciclo de Entrenamiento Completo</strong></h4>
+            <p>Esta actualización no es un evento aislado, sino el paso final de un proceso iterativo que constituye el corazón del aprendizaje automático. El ciclo de entrenamiento completo, ahora con sus cuatro etapas explícitas, es el siguiente:</p>
+            <ol>
+                <li><strong>Forward Pass:</strong> Con los parámetros \(W\) y \(B\) actuales, calcular las predicciones \(Z = XW + B\).</li>
+                <li><strong>Loss Computation:</strong> Calcular el error escalar \(\text{MSE}\) comparando \(Z\) con los valores reales \(Y\).</li>
+                <li><strong>Backward Pass:</strong> Calcular los tensores de gradientes, \(\frac{\partial \text{MSE}}{\partial W}\) y \(\frac{\partial \text{MSE}}{\partial B}\), utilizando las fórmulas simplificadas que derivamos.</li>
+                <li><strong>Optimización:</strong> Actualizar los parámetros \(W\) y \(B\) utilizando las reglas de actualización del Descenso de Gradiente.</li>
+            </ol>
+            <p>Este ciclo se repite una y otra vez. Con cada iteración, los parámetros del modelo se refinan sutilmente, "descendiendo" gradualmente por la superficie de la pérdida. Si la tasa de aprendizaje está bien elegida, este proceso iterativo convergerá hacia un conjunto de parámetros que minimizan el error, resultando en un modelo que ha "aprendido" la relación lineal subyacente en los datos.</p>
+            <p>Hemos completado nuestro viaje, partiendo de la simple observación de una tendencia en los datos y llegando a la construcción de un algoritmo de optimización funcional, todo ello derivado desde los primeros principios matemáticos. Hemos diseccionado el funcionamiento interno de la Regresión Lineal, no como una caja negra, sino como un objeto matemático elegante y comprensible.</p>
