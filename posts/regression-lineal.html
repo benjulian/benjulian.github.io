@@ -365,13 +365,13 @@
             \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} 2(Z_{ac} - Y_{ac}) \cdot \frac{\partial (Z_{ac} - Y_{ac})}{\partial Z_{a'c'}} 
             \]
             
-            <p>En la derivada interna, el elemento \( Y_{ac} \) es una variable constante con respecto a \( Z_{a'c'} \), por lo que su valor es simplemente 0. Ahora, la derivada de lo que queda del término interno, \(\frac{\partial Z_{ac}}{\partial Z_{a'c'}}\), es 1 si y solo si los índices coinciden ( \(a=a' \) y \( c=c' \)), y 0 en caso contrario. Esta es precisamente la definición del producto de dos <strong>Deltas de Kronecker</strong>: \( \delta_{aa'} \delta_{cc'} \).</p>
+            <p>En la derivada interna, el elemento \( Y_{ac} \) es una variable constante con respecto a \( Z_{a'c'} \), por lo que su valor es simplemente 0. Ahora, la derivada de lo que queda del término interno, \( \frac{\partial Z_{ac}}{\partial Z_{a'c'}} \), es 1 si y solo si los índices coinciden ( \( a=a' \) y \( c=c' \) ), y 0 en caso contrario. Esta es precisamente la definición del producto de dos <strong>Deltas de Kronecker</strong>: \( \delta_{aa'} \delta_{cc'} \).</p>
             
             \[ 
             \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \sum_{a=1}^{a} \sum_{c=1}^{c} 2(Z_{ac} - Y_{ac}) \cdot \delta_{aa'} \delta_{cc'} 
             \]
             
-            <p>El Delta de Kronecker tiene una propiedad fundamental: cuando multiplica a una expresión dentro de una suma, <strong>colapsa la suma</strong>. La presencia de \( \delta_{aa'} \) hace que todos los términos de la suma sobre \( a \) se anulen, excepto el único término donde \( a=a' \). Lo mismo ocurre con \(\ delta_{cc'} \) y la suma sobre \( c \). Como resultado, las sumas desaparecen y los índices mudos \( a \) y \( c \) son <strong>sustituidos</strong> por los índices fijos \( a' \) y \( c' \):</p>
+            <p>El Delta de Kronecker tiene una propiedad fundamental: cuando multiplica a una expresión dentro de una suma, <strong>colapsa la suma</strong>. La presencia de \( \delta_{aa'} \) hace que todos los términos de la suma sobre \( a \) se anulen, excepto el único término donde \( a=a' \). Lo mismo ocurre con \( \delta_{cc'} \) y la suma sobre \( c \). Como resultado, las sumas desaparecen y los índices mudos \( a \) y \( c \) son <strong>sustituidos</strong> por los índices fijos \( a' \) y \( c' \):</p>
             
             \[ 
             \frac{\partial \text{MSE}}{\partial Z_{a'c'}} = \frac{1}{n} \cdot 2(Z_{a'c'} - Y_{a'c'}) 
